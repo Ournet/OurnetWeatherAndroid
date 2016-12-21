@@ -9,9 +9,9 @@ import java.io.IOException;
  * Created by Dumitru Cantea on 12/20/16.
  */
 
-public class UserLocation {
-    public float longitude;
-    public float latitude;
+public class UserLocation implements ILocation {
+    public Float longitude;
+    public Float latitude;
     public String country_code;
 
     public UserLocation(String country_code, float latitude, float longitude) {
@@ -27,5 +27,15 @@ public class UserLocation {
         float lon = (float) data.getDouble("lon");
 
         return new UserLocation(countryCode, lat, lon);
+    }
+
+    @Override
+    public float getLongitude() {
+        return longitude;
+    }
+
+    @Override
+    public float getLatitude() {
+        return latitude;
     }
 }

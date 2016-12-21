@@ -1,41 +1,93 @@
 package com.ournet.weather.data;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Dumitru Cantea on 12/20/16.
  */
 
 public class UserPlaces {
-    private static ArrayList<Place> places;
+    private List<Place> placesList = null;
 
-    public static ArrayList<Place> get() {
-        if (places == null) {
-            places = new ArrayList();
+    public List<Place> get() {
+        if (placesList == null) {
+            placesList = load();
         }
 
-        return places;
+        return placesList;
     }
 
-    public static boolean add(Place place) {
-        ArrayList<Place> places = UserPlaces.get();
+    public boolean add(Place place) {
+        List<Place> places = get();
 
         for (Place p : places) {
             if (p.id == place.id) {
                 return false;
             }
         }
-        return places.add(place);
+        places.add(place);
+
+        return save();
     }
 
-    public static boolean remove(int id) {
-        ArrayList<Place> places = UserPlaces.get();
+    public boolean removeById(int id) {
+        List<Place> places = get();
 
         for (Place p : places) {
             if (p.id == id) {
-                return places.remove(p);
+                return remove(p);
             }
         }
         return false;
+    }
+
+    public boolean remove(Place place) {
+        List<Place> places = get();
+
+        if (places.remove(place)) {
+            return save();
+        }
+        return false;
+    }
+
+    public boolean setSelected(Place place) {
+        List<Place> places = get();
+
+        if (!places.contains(place)) {
+            return false;
+        }
+
+        for (Place p : places) {
+            p.isSelected = false;
+        }
+
+        place.isSelected = true;
+
+        return true;
+    }
+
+    public Place getSelected() {
+        List<Place> places = get();
+        for (Place place : places) {
+            if (place.isSelected) {
+                return place;
+            }
+        }
+        if (!places.isEmpty()) {
+            Place place = places.get(0);
+            place.isSelected = true;
+            return place;
+        }
+
+        return null;
+    }
+
+    boolean save() {
+        return false;
+    }
+
+    List<Place> load() {
+        return new ArrayList<Place>();
     }
 }

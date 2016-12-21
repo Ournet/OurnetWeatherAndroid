@@ -1,5 +1,9 @@
 package com.ournet.weather;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +14,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,6 +22,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.TextView;
+
+import com.ournet.weather.data.Place;
+
+import org.json.JSONException;
+
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,13 +46,14 @@ public class MainActivity extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -49,6 +62,16 @@ public class MainActivity extends AppCompatActivity {
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+
+        try {
+            initPlace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+//        mViewPager.addOnPageChangeListener();
 
 
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -62,8 +85,53 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public void setPlace(Place place) {
+        String lang = Settings.language();
+        String title = place.name(lang);
+        String subTitle = place.country_code.toUpperCase();
+        if (place.region != null) {
+            subTitle = place.region.name(lang) + ", " + subTitle;
+        }
 
-//    @Override
+        toolbar.setTitle(title);
+        toolbar.setSubtitle(subTitle);
+    }
+
+    private void initPlace() throws ExecutionException, InterruptedException {
+//        ConnectivityManager connMgr = (ConnectivityManager)
+//                getSystemService(Context.CONNECTIVITY_SERVICE);
+//        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+//        if (networkInfo != null && networkInfo.isConnected()) {
+//            // fetch data
+//        } else {
+//            // display error
+//        }
+        Place place = Settings.places.getSelected();
+        if (place == null) {
+            place = new PlaceTask().execute().get();
+        }
+
+        if (place != null) {
+            setPlace(place);
+        }
+    }
+
+    class PlaceTask extends AsyncTask<String, Void, Place> {
+
+        @Override
+        protected Place doInBackground(String... params) {
+            try {
+                return Settings.exploreSelectedPlace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
+
+    //    @Override
 //    public boolean onCreateOptionsMenu(Menu menu) {
 //        // Inflate the menu; this adds items to the action bar if it is present.
 //        getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -141,19 +209,6 @@ public class MainActivity extends AppCompatActivity {
         public int getCount() {
             // Show 3 total pages.
             return 3;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return "SECTION 1";
-                case 1:
-                    return "SECTION 2";
-                case 2:
-                    return "SECTION 3";
-            }
-            return null;
         }
     }
 }
