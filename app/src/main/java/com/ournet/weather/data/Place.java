@@ -1,5 +1,7 @@
 package com.ournet.weather.data;
 
+import android.util.Log;
+
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -31,18 +33,26 @@ public class Place implements ILocation {
         Place place = new Place();
         place.names = new HashMap();
 
+        Log.i("place", data.toString());
+
         try {
             place.id = data.getInt("id");
             place.name = data.getString("name");
-            place.longitude = ((float) data.getDouble("longitude"));
-            place.latitude = ((float) data.getDouble("latitude"));
-            place.country_code = data.getString("country_code").toUpperCase();
+            if (data.has("longitude")) {
+                place.longitude = ((float) data.getDouble("longitude"));
+            }
+            if (data.has("latitude")) {
+                place.latitude = ((float) data.getDouble("latitude"));
+            }
+            if (data.has("country_code")) {
+                place.country_code = data.getString("country_code").toUpperCase();
+            }
             if (data.has("isSelected")) {
                 place.isSelected = data.getBoolean("isSelected");
             }
-
-            place.region = Place.create(data.getJSONObject("region"));
-
+            if (data.has("region")) {
+                place.region = Place.create(data.getJSONObject("region"));
+            }
 
             // is from API
             if (data.has("alternatenames")) {
@@ -69,7 +79,7 @@ public class Place implements ILocation {
 //                }
             }
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
 
         return place;

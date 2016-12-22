@@ -15,27 +15,28 @@ public class OurnetApi {
 
     private static JSONObject graphql(String json) throws IOException, JSONException {
         HashMap<String, String> props = new HashMap<>();
-        props.put("Content-Type", "text/json");
+        props.put("Content-Type", "application/json");
+        props.put("Accept", "application/json");
 
-        return JsonClient.post("http://10.0.2.2:41522/graphql", props, json.getBytes("UTF-8")).getJSONObject("data");
+        return JsonClient.post("http://10.0.2.2:41522/graphql", props, json).getJSONObject("data");
     }
 
     public static ForecastReport getForecast(ILocation location, ForecastDetails details) throws JSONException, IOException {
 
-        String json = "{weatherReport(latitude:@latitude,longitude:@longitude)}";
+        String json = "{\"query\": \"{weatherReport(latitude:@latitude,longitude:@longitude)}\"}";
         json = json.replace("@latitude", String.valueOf(location.getLatitude()));
         json = json.replace("@longitude", String.valueOf(location.getLongitude()));
 
-        JSONObject data = graphql(json);
+        JSONObject data = graphql(json).getJSONObject("weatherReport");
 
         return ForecastReport.create(data);
     }
 
     public static Place findPlace(int id) throws JSONException, IOException {
-        String json = "{geoPlace(id=@id){id,name,alternatenames,country_code,region{id,name,alternatenames}}}";
+        String json = "{\"query\":\"{geoPlace(id:@id){id,name,alternatenames,country_code,longitude,latitude,region{id,name,alternatenames}}}\"}";
         json = json.replace("@id", String.valueOf(id));
 
-        JSONObject data = graphql(json);
+        JSONObject data = graphql(json).getJSONObject("geoPlace");
 
         return Place.create(data);
     }

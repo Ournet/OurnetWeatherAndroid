@@ -86,6 +86,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setPlace(Place place) {
+        if (place == null) {
+            return;
+        }
         String lang = Settings.language();
         String title = place.name(lang);
         String subTitle = place.country_code.toUpperCase();
@@ -109,6 +112,9 @@ public class MainActivity extends AppCompatActivity {
         Place place = Settings.places.getSelected();
         if (place == null) {
             place = new PlaceTask().execute().get();
+            if (place != null) {
+                Settings.places.setSelected(place);
+            }
         }
 
         if (place != null) {

@@ -52,11 +52,10 @@ public class UserPlaces {
     }
 
     public boolean setSelected(Place place) {
-        List<Place> places = get();
 
-        if (!places.contains(place)) {
-            return false;
-        }
+        add(place);
+
+        List<Place> places = get();
 
         for (Place p : places) {
             p.isSelected = false;
