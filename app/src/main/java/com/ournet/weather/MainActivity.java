@@ -23,11 +23,14 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 
+import com.ournet.weather.data.ForecastReport;
+import com.ournet.weather.data.ILocation;
 import com.ournet.weather.data.Place;
 
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
@@ -41,12 +44,15 @@ public class MainActivity extends AppCompatActivity {
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
+    private Forecast forecast;
+    private ForecastReport report;
 
     /**
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
     private Toolbar toolbar;
+    protected static Place place;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,13 +69,9 @@ public class MainActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        try {
-            initPlace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        this.forecast = new Forecast(this);
+
+        explorePlace();
 
 //        mViewPager.addOnPageChangeListener();
 
@@ -89,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
         if (place == null) {
             return;
         }
+        MainActivity.place = place;
+
         String lang = Settings.language();
         String title = place.name(lang);
         String subTitle = place.country_code.toUpperCase();
@@ -98,9 +102,35 @@ public class MainActivity extends AppCompatActivity {
 
         toolbar.setTitle(title);
         toolbar.setSubtitle(subTitle);
+
+        exploreForecast();
     }
 
-    private void initPlace() throws ExecutionException, InterruptedException {
+    public void refreshForecast() {
+        exploreForecast(new Date());
+    }
+
+    private void exploreForecast() {
+        exploreForecast(null);
+    }
+
+    private void exploreForecast(Date date) {
+        ForecastReport report = null;
+        try {
+            if (date != null) {
+                report = new ReportTask().execute(date.getTime()).get();
+            } else {
+                report = new ReportTask().execute().get();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        this.report = report;
+    }
+
+    private void explorePlace() {
 //        ConnectivityManager connMgr = (ConnectivityManager)
 //                getSystemService(Context.CONNECTIVITY_SERVICE);
 //        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
@@ -111,7 +141,13 @@ public class MainActivity extends AppCompatActivity {
 //        }
         Place place = Settings.places.getSelected();
         if (place == null) {
-            place = new PlaceTask().execute().get();
+            try {
+                place = new PlaceTask().execute().get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
             if (place != null) {
                 Settings.places.setSelected(place);
             }
@@ -128,6 +164,25 @@ public class MainActivity extends AppCompatActivity {
         protected Place doInBackground(String... params) {
             try {
                 return Settings.exploreSelectedPlace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
+
+    class ReportTask extends AsyncTask<Long, Void, ForecastReport> {
+
+        @Override
+        protected ForecastReport doInBackground(Long... params) {
+            try {
+                Date date = null;
+                if (params.length > 0 && params[0] != null) {
+                    date = new Date(params[0]);
+                }
+                return forecast.getReport(MainActivity.place, date);
             } catch (JSONException e) {
                 e.printStackTrace();
             } catch (IOException e) {

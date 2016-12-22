@@ -1,9 +1,13 @@
 package com.ournet.weather.data;
 
+import android.content.Context;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -14,9 +18,19 @@ import java.util.Date;
 public class ForecastReport {
     public ArrayList<DayReport> days = new ArrayList<>();
     public String timezone;
+    public Date updatedAt;
+    private JSONObject json = null;
 
     public static ForecastReport create(JSONObject json) throws JSONException {
         ForecastReport report = new ForecastReport();
+        report.json = json;
+
+        if (json.has("updatedAt")) {
+            report.updatedAt = new Date(json.getLong("updatedAt"));
+        } else {
+            report.updatedAt = new Date();
+            json.put("updatedAt", report.updatedAt.getTime());
+        }
 
         if (json.has("timezone")) {
             report.timezone = json.getString("timezone");
@@ -62,5 +76,33 @@ public class ForecastReport {
 
             return report;
         }
+    }
+
+    public boolean save(Context context, ILocation location) {
+
+        try {
+            return FileStorage.save(context, fileName(location), this.json);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static ForecastReport load(Context context, ILocation location) {
+        JSONObject json;
+        try {
+            json = FileStorage.loadJson(context, fileName(location));
+            return ForecastReport.create(json);
+        } catch (IOException e) {
+            return null;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private static String fileName(ILocation location) {
+        DecimalFormat format = new DecimalFormat("#.##");
+        return "wr-" + format.format(location.getLatitude()) + ':' + format.format(location.getLongitude());
     }
 }

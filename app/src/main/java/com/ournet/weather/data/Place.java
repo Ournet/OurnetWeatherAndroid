@@ -94,4 +94,9 @@ public class Place implements ILocation {
     public float getLatitude() {
         return latitude;
     }
+
+    @Override
+    public Integer getId() {
+        return id;
+    }
 }

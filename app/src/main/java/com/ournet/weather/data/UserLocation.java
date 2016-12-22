@@ -38,4 +38,9 @@ public class UserLocation implements ILocation {
     public float getLatitude() {
         return latitude;
     }
+
+    @Override
+    public Integer getId() {
+        return null;
+    }
 }
