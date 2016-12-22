@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -86,7 +87,7 @@ public class ForecastReportFragment extends BaseFragment {
 //            if (vi == null) {
                 vi = inflater.inflate(R.layout.item_weather_report_day, null);
 //            }
-            ListView listView = (ListView) vi.findViewById(R.id.item_weather_report_day_list);
+            LinearLayout containerView = (LinearLayout) vi.findViewById(R.id.item_weather_report_day_container);
 
             ForecastReport.DayReport data = report.days.get(position);
 
@@ -94,59 +95,22 @@ public class ForecastReportFragment extends BaseFragment {
             SimpleDateFormat dformat= new SimpleDateFormat("E, d MMM", Locale.getDefault());
             dateView.setText(dformat.format(data.date));
 
-            listView.setAdapter(new ForecastTimesAdapter(this.context, report.days.get(position).times));
+            for(int i=0;i<data.times.size();i++){
+                View row = inflater.inflate(R.layout.item_weather_report_time, null);
+                ForecastReport.TimeReport time = data.times.get(i);
+                TextView textView = (TextView) row.findViewById(R.id.item_weather_report_time_date);
+                textView.setText(time.date.toString());
+                dformat= new SimpleDateFormat("HH:00", Locale.getDefault());
+                textView.setText(dformat.format(time.date));
+                textView = (TextView) row.findViewById(R.id.item_weather_report_time_temperature);
+                textView.setText(String.valueOf(time.temperature.intValue())+"°");
+                textView = (TextView) row.findViewById(R.id.item_weather_report_time_wind_speed);
+                textView.setText(time.windSpeed.toString());
+                textView = (TextView) row.findViewById(R.id.item_weather_report_time_pressure);
+                textView.setText(time.pressure.toString());
 
-            return vi;
-        }
-    }
-
-    class ForecastTimesAdapter extends BaseAdapter {
-
-        Context context;
-        private LayoutInflater inflater = null;
-        ArrayList<ForecastReport.TimeReport> times;
-
-        public ForecastTimesAdapter(Context context, ArrayList<ForecastReport.TimeReport> times) {
-            this.context = context;
-            this.times = times;
-            inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        }
-
-        @Override
-        public int getCount() {
-            return times.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return times.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return times.get(position).date.getTime();
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            // TODO Auto-generated method stub
-            View vi = convertView;
-            if (vi == null) {
-                vi = inflater.inflate(R.layout.item_weather_report_time, null);
+                containerView.addView(row);
             }
-            ForecastReport.TimeReport data = times.get(position);
-            TextView textView = (TextView) vi.findViewById(R.id.item_weather_report_time_date);
-            textView.setText(data.date.toString());
-            SimpleDateFormat dformat= new SimpleDateFormat("HH:00", Locale.getDefault());
-            textView.setText(dformat.format(data.date));
-            textView = (TextView) vi.findViewById(R.id.item_weather_report_time_temperature);
-            textView.setText(String.valueOf(data.temperature.intValue())+"°");
-            textView = (TextView) vi.findViewById(R.id.item_weather_report_time_wind_speed);
-            textView.setText(data.windSpeed.toString());
-            textView = (TextView) vi.findViewById(R.id.item_weather_report_time_pressure);
-            textView.setText(data.pressure.toString());
-
-            Log.i("adapter", "time view" + position + " - " + data.date.toString());
 
             return vi;
         }
