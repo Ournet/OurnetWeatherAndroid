@@ -19,11 +19,25 @@ public class Place implements ILocation {
     public String country_code;
     public Place region;
     public boolean isSelected = false;
+    private JSONObject json;
 
     private Map<String, String> names = new HashMap();
 
+    public Place(){
+
+    }
+
+    public Place(float longitude, float latitude){
+        this.longitude=longitude;
+        this.latitude=latitude;
+    }
+
     public String name(String lang) {
         return names.containsKey(lang) ? names.get(lang) : this.name;
+    }
+
+    public JSONObject getJson() {
+        return this.json;
     }
 
     public static Place create(JSONObject data) {
@@ -31,7 +45,7 @@ public class Place implements ILocation {
             return null;
         }
         Place place = new Place();
-        place.names = new HashMap();
+        place.json = data;
 
         Log.i("place", data.toString());
 

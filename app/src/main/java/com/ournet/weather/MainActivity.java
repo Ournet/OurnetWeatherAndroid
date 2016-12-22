@@ -1,11 +1,6 @@
 package com.ournet.weather;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -14,10 +9,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -26,6 +19,8 @@ import android.widget.TextView;
 import com.ournet.weather.data.ForecastReport;
 import com.ournet.weather.data.ILocation;
 import com.ournet.weather.data.Place;
+import com.ournet.weather.fragments.BaseFragment;
+import com.ournet.weather.fragments.ForecastReportFragment;
 
 import org.json.JSONException;
 
@@ -33,7 +28,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnPlaceChanged {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -46,13 +41,15 @@ public class MainActivity extends AppCompatActivity {
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private Forecast forecast;
     private ForecastReport report;
+    private BaseFragment activeFragment;
 
     /**
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
     private Toolbar toolbar;
-    protected static Place place;
+    protected Place place;
+    protected UserPlaces places;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
+        this.places = new UserPlaces(this);
         this.forecast = new Forecast(this);
 
         explorePlace();
@@ -91,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         if (place == null) {
             return;
         }
-        MainActivity.place = place;
+        this.place = place;
 
         String lang = Settings.language();
         String title = place.name(lang);
@@ -103,24 +101,24 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setTitle(title);
         toolbar.setSubtitle(subTitle);
 
-        exploreForecast();
+        exploreForecast(place);
     }
 
     public void refreshForecast() {
-        exploreForecast(new Date());
+        exploreForecast(place, new Date());
     }
 
-    private void exploreForecast() {
-        exploreForecast(null);
+    private void exploreForecast(Place place) {
+        exploreForecast(place, null);
     }
 
-    private void exploreForecast(Date date) {
+    private void exploreForecast(Place place, Date date) {
         ForecastReport report = null;
         try {
             if (date != null) {
-                report = new ReportTask().execute(date.getTime()).get();
+                report = new ReportTask().execute(place, date.getTime()).get();
             } else {
-                report = new ReportTask().execute().get();
+                report = new ReportTask().execute(place).get();
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -128,6 +126,9 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         this.report = report;
+        if (this.activeFragment != null && ForecastReportFragment.class == this.activeFragment.getClass()) {
+            ((ForecastReportFragment) this.activeFragment).setForecastReport(report);
+        }
     }
 
     private void explorePlace() {
@@ -139,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
 //        } else {
 //            // display error
 //        }
-        Place place = Settings.places.getSelected();
+        Place place = places.getSelected();
         if (place == null) {
             try {
                 place = new PlaceTask().execute().get();
@@ -149,13 +150,18 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
             if (place != null) {
-                Settings.places.setSelected(place);
+                this.places.setSelected(place);
             }
         }
 
         if (place != null) {
             setPlace(place);
         }
+    }
+
+    @Override
+    public void placeChanged(Place place) {
+        setPlace(place);
     }
 
     class PlaceTask extends AsyncTask<String, Void, Place> {
@@ -173,16 +179,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    class ReportTask extends AsyncTask<Long, Void, ForecastReport> {
+    class ReportTask extends AsyncTask<Object, Void, ForecastReport> {
 
         @Override
-        protected ForecastReport doInBackground(Long... params) {
+        protected ForecastReport doInBackground(Object... params) {
             try {
                 Date date = null;
-                if (params.length > 0 && params[0] != null) {
-                    date = new Date(params[0]);
+                if (params.length > 1 && params[1] != null) {
+                    date = new Date((long) params[1]);
                 }
-                return forecast.getReport(MainActivity.place, date);
+                return forecast.getReport((ILocation) params[0], date);
             } catch (JSONException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -243,6 +249,7 @@ public class MainActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
             textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
             return rootView;
@@ -261,15 +268,25 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+            BaseFragment fragment = null;
+            switch (position) {
+                case 0:
+                    ForecastReportFragment f = new ForecastReportFragment();
+                    f.setPlace(place);
+                    f.setForecastReport(report);
+                    fragment = f;
+                    break;
+            }
+
+            activeFragment = fragment;
+
+            return fragment;
         }
 
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 3;
+            return 1;
         }
     }
 }

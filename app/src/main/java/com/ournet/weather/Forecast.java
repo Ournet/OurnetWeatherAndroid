@@ -1,9 +1,6 @@
 package com.ournet.weather;
 
 import android.content.Context;
-import android.support.annotation.IntegerRes;
-import android.text.format.DateUtils;
-import android.util.Log;
 
 import com.ournet.weather.data.ForecastReport;
 import com.ournet.weather.data.ILocation;
@@ -31,7 +28,7 @@ public class Forecast {
             minDate = defaultMinDate();
         }
 
-        ForecastReport report;
+        ForecastReport report=null;
 
         report = ForecastReport.load(this.context, location);
         if (report != null) {

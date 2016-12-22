@@ -23,9 +23,15 @@ public class OurnetApi {
 
     public static ForecastReport getForecast(ILocation location, ForecastDetails details) throws JSONException, IOException {
 
-        String json = "{\"query\": \"{weatherReport(latitude:@latitude,longitude:@longitude)}\"}";
+        String json = "{\"query\": \"{weatherReport(latitude:@latitude,longitude:@longitude,days:@days)}\"}";
         json = json.replace("@latitude", String.valueOf(location.getLatitude()));
         json = json.replace("@longitude", String.valueOf(location.getLongitude()));
+        String days = "null";
+        if (details != null && details.days > 0) {
+            days = details.days.toString();
+        }
+
+        json = json.replace("@days", days);
 
         JSONObject data = graphql(json).getJSONObject("weatherReport");
 

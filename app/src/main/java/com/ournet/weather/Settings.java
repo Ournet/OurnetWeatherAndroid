@@ -2,7 +2,6 @@ package com.ournet.weather;
 
 import com.ournet.weather.data.Place;
 import com.ournet.weather.data.UserLocation;
-import com.ournet.weather.data.UserPlaces;
 import com.ournet.weather.data.OurnetApi;
 
 import org.json.JSONException;
@@ -15,8 +14,6 @@ import java.util.Locale;
  */
 
 public class Settings {
-    public final static UserPlaces places = new UserPlaces();
-
     /**
      * Find user place
      */

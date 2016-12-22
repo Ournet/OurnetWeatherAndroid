@@ -1,6 +1,7 @@
 package com.ournet.weather.data;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,8 +53,16 @@ public class ForecastReport {
         public Date date;
         public ArrayList<TimeReport> times = new ArrayList<>();
 
-        public static DayReport create(JSONObject json) {
+        public static DayReport create(JSONObject json) throws JSONException {
             DayReport report = new DayReport();
+
+            report.stringDate = json.getString("date");
+            report.date = java.sql.Date.valueOf(report.stringDate);
+
+            JSONArray times = json.getJSONArray("times");
+            for (int i = 0; i < times.length(); i++) {
+                report.times.add(TimeReport.create((JSONObject) times.get(i)));
+            }
 
             return report;
         }
@@ -71,8 +80,30 @@ public class ForecastReport {
         public Float cloudiness;
         public Float fog;
 
-        public static TimeReport create(JSONObject json) {
+        public static TimeReport create(JSONObject json) throws JSONException {
             TimeReport report = new TimeReport();
+
+            report.date = new Date(json.getLong("time"));
+            report.symbol = json.getJSONObject("symbol").getInt("number");
+            report.windDirection = json.getJSONObject("wind").getJSONObject("dir").getString("code");
+            report.windSpeed = (float) json.getJSONObject("wind").getJSONObject("speed").getDouble("mps");
+            report.temperature = (float) json.getJSONObject("t").getDouble("value");
+            report.pressure = (float) json.getJSONObject("pressure").getDouble("value");
+            if (json.has("humidity")) {
+                if (json.getJSONObject("humidity").has("percent")) {
+                    report.humidity = (float) json.getJSONObject("humidity").getDouble("percent");
+                }
+            }
+            if (json.has("cloudiness")) {
+                if (json.getJSONObject("cloudiness").has("percent")) {
+                    report.cloudiness = (float) json.getJSONObject("cloudiness").getDouble("percent");
+                }
+            }
+            if (json.has("fog")) {
+                if (json.getJSONObject("fog").has("percent")) {
+                    report.fog = (float) json.getJSONObject("fog").getDouble("percent");
+                }
+            }
 
             return report;
         }
