@@ -1,5 +1,7 @@
 package com.ournet.weather;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -21,6 +23,7 @@ import com.ournet.weather.data.ILocation;
 import com.ournet.weather.data.Place;
 import com.ournet.weather.fragments.BaseFragment;
 import com.ournet.weather.fragments.ForecastReportFragment;
+import com.ournet.weather.fragments.PlacesFragment;
 
 import org.json.JSONException;
 
@@ -65,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged {
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.setCurrentItem(1);
 
         this.places = new UserPlaces(this);
         this.forecast = new Forecast(this);
@@ -101,7 +105,15 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged {
         toolbar.setTitle(title);
         toolbar.setSubtitle(subTitle);
 
+        if (activeFragment != null) {
+            activeFragment.placeChanged(place);
+        }
+
         exploreForecast(place);
+    }
+
+    public void goToForecast() {
+        mViewPager.setCurrentItem(1);
     }
 
     public void refreshForecast() {
@@ -157,6 +169,21 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged {
         if (place != null) {
             setPlace(place);
         }
+    }
+
+    public void onClickMoreForecast(View v) {
+        String url = Links.Weather.place(place.country_code, place.id);
+        if (url == null) {
+            Log.e("main", "NO url: " + place.country_code);
+        } else {
+            Log.e("main", "Starging browser url: " + url);
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(browserIntent);
+        }
+    }
+
+    public void onClickRefreshForecast(View v) {
+        refreshForecast();
     }
 
     @Override
@@ -221,42 +248,6 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged {
 //    }
 
     /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        public PlaceholderFragment() {
-        }
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-            return rootView;
-        }
-    }
-
-    /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
@@ -271,10 +262,16 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged {
             BaseFragment fragment = null;
             switch (position) {
                 case 0:
-                    ForecastReportFragment f = new ForecastReportFragment();
-                    f.setPlace(place);
-                    f.setForecastReport(report);
-                    fragment = f;
+                    PlacesFragment placesFragment = new PlacesFragment();
+                    placesFragment.placeChanged(place);
+                    placesFragment.setPlaces(places);
+                    fragment = placesFragment;
+                    break;
+                case 1:
+                    ForecastReportFragment forecastReportFragment = new ForecastReportFragment();
+                    forecastReportFragment.placeChanged(place);
+                    forecastReportFragment.setForecastReport(report);
+                    fragment = forecastReportFragment;
                     break;
             }
 
@@ -286,7 +283,7 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged {
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 1;
+            return 2;
         }
     }
 }

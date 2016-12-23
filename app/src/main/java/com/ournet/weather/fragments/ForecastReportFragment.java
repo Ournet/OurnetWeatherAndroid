@@ -8,10 +8,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.HeaderViewListAdapter;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.WrapperListAdapter;
 
+import com.ournet.weather.MainActivity;
 import com.ournet.weather.R;
 import com.ournet.weather.data.ForecastReport;
 import com.ournet.weather.fragments.BaseFragment;
@@ -42,10 +46,23 @@ public class ForecastReportFragment extends BaseFragment {
         View rootView = inflater.inflate(R.layout.fragment_forecastreport, container, false);
 
         ListView listView = (ListView) rootView.findViewById(R.id.fragment_forecastreport_list);
+        View footerView = inflater.inflate(R.layout.forecast_footer, container, false);
+        TextView textView = (TextView) footerView.findViewById(R.id.forecast_footer_text);
+
         ForecastDaysAdapter forecastAdapter = new ForecastDaysAdapter(this.getContext());
         this.forecastAdapter = forecastAdapter;
+
         listView.setAdapter(forecastAdapter);
 
+
+        listView.addFooterView(footerView);
+
+        textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity) getActivity()).onClickMoreForecast(v);
+            }
+        });
         return rootView;
     }
 
@@ -66,8 +83,7 @@ public class ForecastReportFragment extends BaseFragment {
                 return 0;
             }
             int l = report.days.size();
-            return l;
-//            return l > 6 ? 6 : l;
+            return l > 6 ? 6 : l;
         }
 
         @Override
@@ -85,25 +101,25 @@ public class ForecastReportFragment extends BaseFragment {
             // TODO Auto-generated method stub
             View vi = convertView;
 //            if (vi == null) {
-                vi = inflater.inflate(R.layout.item_weather_report_day, null);
+            vi = inflater.inflate(R.layout.item_weather_report_day, null);
 //            }
             LinearLayout containerView = (LinearLayout) vi.findViewById(R.id.item_weather_report_day_container);
 
             ForecastReport.DayReport data = report.days.get(position);
 
             TextView dateView = (TextView) vi.findViewById(R.id.item_weather_report_day_date);
-            SimpleDateFormat dformat= new SimpleDateFormat("E, d MMM", Locale.getDefault());
+            SimpleDateFormat dformat = new SimpleDateFormat("E, d MMM", Locale.getDefault());
             dateView.setText(dformat.format(data.date));
 
-            for(int i=0;i<data.times.size();i++){
+            for (int i = 0; i < data.times.size(); i++) {
                 View row = inflater.inflate(R.layout.item_weather_report_time, null);
                 ForecastReport.TimeReport time = data.times.get(i);
                 TextView textView = (TextView) row.findViewById(R.id.item_weather_report_time_date);
                 textView.setText(time.date.toString());
-                dformat= new SimpleDateFormat("HH:00", Locale.getDefault());
+                dformat = new SimpleDateFormat("HH:00", Locale.getDefault());
                 textView.setText(dformat.format(time.date));
                 textView = (TextView) row.findViewById(R.id.item_weather_report_time_temperature);
-                textView.setText(String.valueOf(time.temperature.intValue())+"°");
+                textView.setText(String.valueOf(time.temperature.intValue()) + "°");
                 textView = (TextView) row.findViewById(R.id.item_weather_report_time_wind_speed);
                 textView.setText(time.windSpeed.toString());
                 textView = (TextView) row.findViewById(R.id.item_weather_report_time_pressure);
@@ -114,5 +130,6 @@ public class ForecastReportFragment extends BaseFragment {
 
             return vi;
         }
+
     }
 }

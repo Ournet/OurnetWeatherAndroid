@@ -36,6 +36,15 @@ public class UserPlaces {
         return placesList;
     }
 
+    public Place get(int id) {
+        for (Place place : get()) {
+            if (place.id == id) {
+                return place;
+            }
+        }
+        return null;
+    }
+
     public boolean add(Place place) {
         List<Place> places = get();
 
