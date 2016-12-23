@@ -1,6 +1,7 @@
 package com.ournet.weather;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.ournet.weather.data.ForecastReport;
 import com.ournet.weather.data.ILocation;
@@ -28,14 +29,17 @@ public class Forecast {
             minDate = defaultMinDate();
         }
 
-        ForecastReport report=null;
+        ForecastReport report = null;
 
         report = ForecastReport.load(this.context, location);
         if (report != null) {
             if (report.updatedAt.getTime() > minDate.getTime()) {
+                Log.i("data", "got forecast from cache file");
                 return report;
             }
         }
+
+        Log.i("data", "Getting forecast from API");
 
         OurnetApi.ForecastDetails details = new OurnetApi.ForecastDetails();
         details.days = 6;

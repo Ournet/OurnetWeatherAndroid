@@ -22,7 +22,10 @@ import com.ournet.weather.fragments.BaseFragment;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * Created by user on 12/22/16.
@@ -35,6 +38,33 @@ public class ForecastReportFragment extends BaseFragment {
     public void setForecastReport(ForecastReport report) {
         Log.i("adapter", "set report");
         this.report = report;
+
+        if (report != null) {
+//            String timezone = report.timezone == null ? mPlace.timezone : report.timezone;
+            Calendar calendar = new GregorianCalendar();
+//            if (timezone != null) {
+//                calendar.setTimeZone(TimeZone.getTimeZone(timezone));
+//            } else {
+//                Log.w("data", "Timezone is null");
+//            }
+            ForecastReport.DayReport firstDay = report.days.get(0);
+            long currentTime = calendar.getTimeInMillis();
+            Log.i("data", "currentDate=" + calendar.getTime());
+            ArrayList<ForecastReport.TimeReport> timesToRemove = new ArrayList();
+
+            for (ForecastReport.TimeReport time : firstDay.times) {
+                if (time.date.getTime() < currentTime) {
+                    timesToRemove.add(time);
+                }
+            }
+            for (ForecastReport.TimeReport time : timesToRemove) {
+                firstDay.times.remove(time);
+            }
+            if (firstDay.times.size() == 0) {
+                report.days.remove(firstDay);
+            }
+        }
+
         if (forecastAdapter != null) {
             forecastAdapter.notifyDataSetChanged();
         }

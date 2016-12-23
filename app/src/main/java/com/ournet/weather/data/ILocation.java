@@ -5,7 +5,7 @@ package com.ournet.weather.data;
  */
 
 public interface ILocation {
-    float getLongitude();
-    float getLatitude();
+    double getLongitude();
+    double getLatitude();
     Integer getId();
 }

@@ -14,8 +14,9 @@ import java.util.Map;
 public class Place implements ILocation {
     public int id;
     public String name;
-    public float longitude;
-    public float latitude;
+    public String timezone;
+    public double longitude;
+    public double latitude;
     public String country_code;
     public Place region;
     public boolean isSelected = false;
@@ -52,11 +53,14 @@ public class Place implements ILocation {
         try {
             place.id = data.getInt("id");
             place.name = data.getString("name");
+            if(data.has("timezone")){
+                place.timezone = data.getString("timezone");
+            }
             if (data.has("longitude")) {
-                place.longitude = ((float) data.getDouble("longitude"));
+                place.longitude = data.getDouble("longitude");
             }
             if (data.has("latitude")) {
-                place.latitude = ((float) data.getDouble("latitude"));
+                place.latitude = data.getDouble("latitude");
             }
             if (data.has("country_code")) {
                 place.country_code = data.getString("country_code").toUpperCase();
@@ -80,18 +84,6 @@ public class Place implements ILocation {
                     }
                 }
             }
-            // is from json file
-            else if (data.has("names")) {
-                JSONObject names = data.getJSONObject("names");
-//                if (names != null) {
-//                    String[] names = alternatenames.split(";");
-//                    for (int i = 0; i < names.length; i++) {
-//                        String name = names[i].substring(0, names[i].length() - 4);
-//                        String lang = names[i].substring(name.length() + 1, name.length() + 3);
-//                        place.names.put(lang, name);
-//                    }
-//                }
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -100,12 +92,12 @@ public class Place implements ILocation {
     }
 
     @Override
-    public float getLongitude() {
+    public double getLongitude() {
         return longitude;
     }
 
     @Override
-    public float getLatitude() {
+    public double getLatitude() {
         return latitude;
     }
 

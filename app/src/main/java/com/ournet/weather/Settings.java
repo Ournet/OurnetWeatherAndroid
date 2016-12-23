@@ -18,8 +18,11 @@ public class Settings {
      * Find user place
      */
     public final static Place exploreSelectedPlace() throws JSONException, IOException {
-        UserLocation location = getUserLocation();
-        Place place = OurnetApi.findPlace(location);
+        UserLocation userLocation = null;
+//        if (userLocation == null) {
+        userLocation = getUserLocation();
+//        }
+        Place place = OurnetApi.findPlace(userLocation);
 
         return place;
     }

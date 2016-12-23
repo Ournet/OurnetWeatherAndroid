@@ -68,7 +68,8 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged {
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-        mViewPager.setCurrentItem(1);
+
+        goToForecast();
 
         this.places = new UserPlaces(this);
         this.forecast = new Forecast(this);
@@ -114,6 +115,10 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged {
 
     public void goToForecast() {
         mViewPager.setCurrentItem(1);
+    }
+
+    public void goToPlaces() {
+        mViewPager.setCurrentItem(0);
     }
 
     public void refreshForecast() {
@@ -166,7 +171,9 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged {
             }
         }
 
-        if (place != null) {
+        if (place == null) {
+            goToPlaces();
+        } else {
             setPlace(place);
         }
     }

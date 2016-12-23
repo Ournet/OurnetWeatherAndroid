@@ -39,7 +39,7 @@ public class OurnetApi {
     }
 
     public static Place findPlace(int id) throws JSONException, IOException {
-        String json = "{\"query\":\"{geoPlace(id:@id){id,name,alternatenames,country_code,longitude,latitude,region{id,name,alternatenames}}}\"}";
+        String json = "{\"query\":\"{geoPlace(id:@id){id,name,alternatenames,timezone,country_code,longitude,latitude,region{id,name,alternatenames}}}\"}";
         json = json.replace("@id", String.valueOf(id));
 
         JSONObject data = graphql(json).getJSONObject("geoPlace");
@@ -49,8 +49,8 @@ public class OurnetApi {
 
     public static Place findPlace(ILocation location) throws JSONException, IOException {
         String url = "http://api.geonames.org/findNearbyPlaceNameJSON?lat=@lat&lng=@lng&username=ournet&feature_class=P&fcode=PPL&fcode=PPLC&fcode=PPLA";
-        url = url.replace("@lat", Float.toString(location.getLatitude()));
-        url = url.replace("@lng", Float.toString(location.getLongitude()));
+        url = url.replace("@lat", Double.toString(location.getLatitude()));
+        url = url.replace("@lng", Double.toString(location.getLongitude()));
 
         JSONObject data = JsonClient.get(url);
 

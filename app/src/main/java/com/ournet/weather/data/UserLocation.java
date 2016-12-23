@@ -10,12 +10,17 @@ import java.io.IOException;
  */
 
 public class UserLocation implements ILocation {
-    public Float longitude;
-    public Float latitude;
+    public Double longitude;
+    public Double latitude;
     public String country_code;
 
-    public UserLocation(String country_code, float latitude, float longitude) {
+    public UserLocation(String country_code, double latitude, double longitude) {
         this.country_code = country_code;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
+    public UserLocation(double latitude, double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
     }
@@ -30,12 +35,12 @@ public class UserLocation implements ILocation {
     }
 
     @Override
-    public float getLongitude() {
+    public double getLongitude() {
         return longitude;
     }
 
     @Override
-    public float getLatitude() {
+    public double getLatitude() {
         return latitude;
     }
 
