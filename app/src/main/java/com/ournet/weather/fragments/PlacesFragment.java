@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
@@ -18,13 +19,18 @@ import com.ournet.weather.Settings;
 import com.ournet.weather.UserPlaces;
 import com.ournet.weather.Utils;
 import com.ournet.weather.data.ForecastReport;
+import com.ournet.weather.data.OurnetApi;
 import com.ournet.weather.data.Place;
+import com.ournet.weather.ui.DelayAutoCompleteTextView;
 
+import org.json.JSONException;
+
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 /**
- * Created by user on 12/23/16.
+ * Created by Dumitru Cantea on 12/23/16.
  */
 
 public class PlacesFragment extends BaseFragment {
@@ -48,12 +54,13 @@ public class PlacesFragment extends BaseFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_places, container, false);
 
         ListView listView = (ListView) rootView.findViewById(R.id.places_listview);
 
+//        final LayoutInflater inflater1=inflater;
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -72,6 +79,27 @@ public class PlacesFragment extends BaseFragment {
         this.mPlacesAdapter = new PlacesAdapter(this.getContext());
 
         listView.setAdapter(this.mPlacesAdapter);
+
+        final DelayAutoCompleteTextView placeTitle = (DelayAutoCompleteTextView) rootView.findViewById(R.id.place_search_title);
+        placeTitle.setThreshold(3);
+        placeTitle.setAdapter(new PlaceAutoCompleteAdapter(this.getContext()));
+        placeTitle.setLoadingIndicator(
+                (android.widget.ProgressBar) rootView.findViewById(R.id.place_search_loading_indicator));
+        placeTitle.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Place place = (Place) adapterView.getItemAtPosition(position);
+                place = OurnetApi.taskFindPlace(place.id);
+                if (place != null) {
+                    placeTitle.setText(Utils.name(place));
+                    mUserPlaces.setSelected(place);
+                    placeChanged(place);
+
+//                    InputMethodManager imm = (InputMethodManager)inflater1.getSystemService(Context.INPUT_METHOD_SERVICE);
+//                    imm.hideSoftInputFromWindow(placeTitle.getWindowToken(), 0);
+                }
+            }
+        });
 
         return rootView;
     }
@@ -114,6 +142,10 @@ public class PlacesFragment extends BaseFragment {
 //            }
 
             Place data = mUserPlaces.get().get(position);
+
+            if (data.isSelected) {
+                vi.setBackgroundColor(getResources().getColor(R.color.colorWhite));
+            }
 
             TextView textView = (TextView) vi.findViewById(R.id.listitem_place_name);
             textView.setText(Utils.name(data));

@@ -34,6 +34,7 @@ import java.util.TimeZone;
 public class ForecastReportFragment extends BaseFragment {
     ForecastReport report;
     ForecastDaysAdapter forecastAdapter;
+    ListView listView = null;
 
     public void setForecastReport(ForecastReport report) {
         Log.i("adapter", "set report");
@@ -68,6 +69,13 @@ public class ForecastReportFragment extends BaseFragment {
         if (forecastAdapter != null) {
             forecastAdapter.notifyDataSetChanged();
         }
+
+        if (listView != null) {
+//            listView.setSelection(0);
+//            listView.setSelectionAfterHeaderView();
+
+//            Log.i("view", "setViewData position 0");
+        }
     }
 
     @Override
@@ -75,7 +83,7 @@ public class ForecastReportFragment extends BaseFragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_forecastreport, container, false);
 
-        ListView listView = (ListView) rootView.findViewById(R.id.fragment_forecastreport_list);
+        listView = (ListView) rootView.findViewById(R.id.fragment_forecastreport_list);
         View footerView = inflater.inflate(R.layout.forecast_footer, container, false);
         TextView textView = (TextView) footerView.findViewById(R.id.forecast_footer_text);
 
@@ -83,7 +91,8 @@ public class ForecastReportFragment extends BaseFragment {
         this.forecastAdapter = forecastAdapter;
 
         listView.setAdapter(forecastAdapter);
-
+//        listView.setSelection(0);
+//        Log.i("setSelection", "aici");
 
         listView.addFooterView(footerView);
 
@@ -154,6 +163,10 @@ public class ForecastReportFragment extends BaseFragment {
                 textView.setText(time.windSpeed.toString());
                 textView = (TextView) row.findViewById(R.id.item_weather_report_time_pressure);
                 textView.setText(time.pressure.toString());
+
+                if (i == data.times.size() - 1) {
+                    row.findViewById(R.id.item_weather_report_time_separator).setVisibility(View.INVISIBLE);
+                }
 
                 containerView.addView(row);
             }

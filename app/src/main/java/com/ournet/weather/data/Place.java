@@ -2,8 +2,11 @@ package com.ournet.weather.data;
 
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,11 +15,11 @@ import java.util.Map;
  */
 
 public class Place implements ILocation {
-    public int id;
+    public Integer id;
     public String name;
     public String timezone;
-    public double longitude;
-    public double latitude;
+    public Double longitude;
+    public Double latitude;
     public String country_code;
     public Place region;
     public boolean isSelected = false;
@@ -24,13 +27,13 @@ public class Place implements ILocation {
 
     private Map<String, String> names = new HashMap();
 
-    public Place(){
+    public Place() {
 
     }
 
-    public Place(float longitude, float latitude){
-        this.longitude=longitude;
-        this.latitude=latitude;
+    public Place(Double longitude, Double latitude) {
+        this.longitude = longitude;
+        this.latitude = latitude;
     }
 
     public String name(String lang) {
@@ -39,6 +42,18 @@ public class Place implements ILocation {
 
     public JSONObject getJson() {
         return this.json;
+    }
+
+    public static ArrayList<Place> create(JSONArray data) throws JSONException {
+        ArrayList<Place> list=new ArrayList();
+        if (data == null || data.length()==0) {
+            return list;
+        }
+        for (int i=0;i<data.length();i++){
+            list.add(Place.create(data.getJSONObject(i)));
+        }
+
+        return list;
     }
 
     public static Place create(JSONObject data) {
@@ -51,9 +66,12 @@ public class Place implements ILocation {
         Log.i("place", data.toString());
 
         try {
-            place.id = data.getInt("id");
             place.name = data.getString("name");
-            if(data.has("timezone")){
+
+            if (data.has("id")) {
+                place.id = data.getInt("id");
+            }
+            if (data.has("timezone")) {
                 place.timezone = data.getString("timezone");
             }
             if (data.has("longitude")) {

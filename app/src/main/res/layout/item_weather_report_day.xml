@@ -8,22 +8,30 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:background="@color/colorPrimary">
+        android:background="@color/colorPrimary"
+        android:padding="5dp">
 
         <TextView
             android:id="@+id/item_weather_report_day_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Date"
-            android:textColor="#ffffff"/>
+            android:textColor="#ffffff" />
     </LinearLayout>
 
 
     <LinearLayout
+        android:id="@+id/item_weather_report_day_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:id="@+id/item_weather_report_day_container"></LinearLayout>
+        android:orientation="vertical"></LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/colorLayoutDark"></LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="4dp"></LinearLayout>
 </LinearLayout>

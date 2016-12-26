@@ -45,17 +45,23 @@ public class UserPlaces {
         return null;
     }
 
-    public boolean add(Place place) {
+    public boolean add(int index, Place place) {
         List<Place> places = get();
+
+//        removeById(place.id);
 
         for (Place p : places) {
             if (p.id == place.id) {
                 return false;
             }
         }
-        places.add(place);
+        places.add(index, place);
 
         return save();
+    }
+
+    public boolean add(Place place) {
+        return add(0, place);
     }
 
     public boolean removeById(int id) {
@@ -84,11 +90,19 @@ public class UserPlaces {
 
         List<Place> places = get();
 
-        for (Place p : places) {
-            p.isSelected = false;
+        try {
+            for (Place p : places) {
+                p.isSelected = false;
+                p.getJson().put("isSelected", false);
+            }
+
+            place.getJson().put("isSelected", true);
+            place.isSelected = true;
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
-        place.isSelected = true;
+        save();
 
         return true;
     }
@@ -116,7 +130,7 @@ public class UserPlaces {
         }
         JSONArray array = json.getJSONArray("places");
         for (int i = 0; i < array.length(); i++) {
-            places.add(Place.create(array.getJSONObject(i)));
+            places.add(i, Place.create(array.getJSONObject(i)));
         }
         return places;
     }

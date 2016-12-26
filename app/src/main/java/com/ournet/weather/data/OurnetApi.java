@@ -1,11 +1,17 @@
 package com.ournet.weather.data;
 
+import android.os.AsyncTask;
+
+import com.ournet.weather.Settings;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by Dumitru Cantea on 12/21/16.
@@ -47,6 +53,32 @@ public class OurnetApi {
         return Place.create(data);
     }
 
+    public static Place taskFindPlace(int id) {
+        try {
+            return new PlaceTask().execute(id).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static ArrayList<Place> findPlaces(String query, String country) throws JSONException, IOException {
+        String json = "{\"query\":\"{geoPlaces(query:\\\"@query\\\",country:@country,limit:5){id,name,alternatenames,country_code,region{name,alternatenames}}}\"}";
+        json = json.replace("@query", query.replaceAll("\"",""));
+        if(country==null || country.length()!=2){
+            json = json.replace("@country", "null");
+        }else{
+            json = json.replace("@country", "\\\""+country+"\\\"");
+        }
+
+        JSONArray data = graphql(json).getJSONArray("geoPlaces");
+
+        return Place.create(data);
+    }
+
     public static Place findPlace(ILocation location) throws JSONException, IOException {
         String url = "http://api.geonames.org/findNearbyPlaceNameJSON?lat=@lat&lng=@lng&username=ournet&feature_class=P&fcode=PPL&fcode=PPLC&fcode=PPLA";
         url = url.replace("@lat", Double.toString(location.getLatitude()));
@@ -60,8 +92,8 @@ public class OurnetApi {
         place.id = data.getInt("geonameId");
         place.name = data.getString("name");
         place.country_code = data.getString("countryCode");
-        place.latitude = (float) data.getDouble("lat");
-        place.longitude = (float) data.getDouble("lng");
+        place.latitude = data.getDouble("lat");
+        place.longitude = data.getDouble("lng");
 
         try {
             Place ournetPlace = OurnetApi.findPlace(place.id);
@@ -78,5 +110,20 @@ public class OurnetApi {
     public static class ForecastDetails {
         public Integer days;
         public ArrayList<String> dates;
+    }
+
+    static class PlaceTask extends AsyncTask<Integer, Void, Place> {
+
+        @Override
+        protected Place doInBackground(Integer... params) {
+            try {
+                return OurnetApi.findPlace(params[0]);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
     }
 }

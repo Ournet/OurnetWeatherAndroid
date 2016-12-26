@@ -14,51 +14,110 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <android.support.design.widget.AppBarLayout
-            android:id="@+id/appbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:theme="@style/AppTheme.AppBarOverlay">
+        <!--<android.support.design.widget.AppBarLayout-->
+            <!--android:id="@+id/appbar"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:theme="@style/AppTheme.AppBarOverlay">-->
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
-                app:layout_scrollFlags="scroll|enterAlways"
-                app:popupTheme="@style/AppTheme.PopupOverlay"
-                app:title="@string/loading">
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Refresh"
-                    android:layout_gravity="right"
-                    android:onClick="onClickRefreshForecast"
-                    />
-            </android.support.v7.widget.Toolbar>
+            <!--<android.support.v7.widget.Toolbar-->
+                <!--android:id="@+id/toolbar"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="?attr/actionBarSize"-->
+                <!--android:background="@color/colorLayout"-->
+                <!--android:titleTextColor="@color/colorWhite"-->
+                <!--app:layout_scrollFlags="scroll|enterAlways"-->
+                <!--app:popupTheme="@style/AppTheme.PopupOverlay"-->
+                <!--app:title="@string/loading">-->
 
-        </android.support.design.widget.AppBarLayout>
+                <!--<Button-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_gravity="right"-->
+                    <!--android:onClick="onClickRefreshForecast"-->
+                    <!--android:text="Refresh" />-->
+            <!--</android.support.v7.widget.Toolbar>-->
 
-        <android.support.v4.view.ViewPager
-            android:id="@+id/container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            android:layout_below="@+id/appbar"
-            android:layout_above="@+id/view_pagger_layout"/>
+        <!--</android.support.design.widget.AppBarLayout>-->
 
         <LinearLayout
-            android:id="@+id/view_pagger_layout"
-            android:layout_width="match_parent"
+            android:id="@+id/appbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_alignParentBottom="true"
-            android:layout_height="wrap_content">
-            <TextView
-                android:layout_width="match_parent"
+            android:padding="@dimen/padding_default">
+            <LinearLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Position" />
+                android:orientation="vertical"
+                android:layout_weight="3">
+                <TextView
+                    android:id="@+id/appbar_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/appbar_subtitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+            <Button
+                android:id="@+id/appbar_refresh_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:layout_weight="1"
+                android:text="Refresh"
+                android:onClick="onClickRefreshForecast"/>
         </LinearLayout>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="@dimen/padding_default"
+            android:layout_above="@+id/viewPagerIndicator"
+            android:layout_below="@+id/appbar"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        </android.support.v4.view.ViewPager>
+
+        <RelativeLayout
+            android:id="@+id/viewPagerIndicator"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:layout_alignParentBottom="true"
+            android:gravity="center"
+            android:padding="@dimen/padding_default">
+
+            <LinearLayout
+                android:id="@+id/viewPagerCountDots"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:orientation="horizontal" />
+
+            <!--<ImageButton-->
+            <!--android:id="@+id/btn_next"-->
+            <!--android:layout_width="42dip"-->
+            <!--android:layout_height="42dip"-->
+            <!--android:layout_alignParentRight="true"-->
+            <!--android:layout_marginRight="15dip"-->
+            <!--android:background="@drawable/btn_round_semitransperant"-->
+            <!--android:src="@mipmap/ic_navigation_arrow_forward" />-->
+
+            <!--<ImageButton-->
+            <!--android:id="@+id/btn_finish"-->
+            <!--android:layout_width="42dip"-->
+            <!--android:layout_height="42dip"-->
+            <!--android:layout_alignParentRight="true"-->
+            <!--android:layout_marginRight="15dip"-->
+            <!--android:background="@drawable/btn_round_semitransperant"-->
+            <!--android:contentDescription="Let's start"-->
+            <!--android:src="@mipmap/ic_navigation_check"-->
+            <!--android:visibility="gone" />-->
+
+        </RelativeLayout>
+
     </RelativeLayout>
 
 

@@ -42,7 +42,7 @@ public class Forecast {
         Log.i("data", "Getting forecast from API");
 
         OurnetApi.ForecastDetails details = new OurnetApi.ForecastDetails();
-        details.days = 6;
+        details.days = 5;
         report = OurnetApi.getForecast(location, details);
 
         if (report != null) {

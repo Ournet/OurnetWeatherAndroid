@@ -16,6 +16,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.ournet.weather.data.ForecastReport;
@@ -31,7 +34,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
-public class MainActivity extends AppCompatActivity implements OnPlaceChanged {
+public class MainActivity extends AppCompatActivity implements OnPlaceChanged, ViewPager.OnPageChangeListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -45,29 +48,43 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged {
     private Forecast forecast;
     private ForecastReport report;
     private BaseFragment activeFragment;
+    private ForecastReportFragment reportFragment;
 
     /**
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
-    private Toolbar toolbar;
+    //    private Toolbar toolbar;
     protected Place place;
     protected UserPlaces places;
+    private LinearLayout pager_indicator;
+    private ImageView[] dots;
+    private TextView pageTitle;
+    private TextView pageSubTitle;
+    private Button refreshButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        pageTitle = (TextView) findViewById(R.id.appbar_title);
+        pageSubTitle = (TextView) findViewById(R.id.appbar_subtitle);
+        refreshButton = (Button) findViewById(R.id.appbar_refresh_btn);
+
+//        toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager = (ViewPager) findViewById(R.id.viewPager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+
+        pager_indicator = (LinearLayout) findViewById(R.id.viewPagerCountDots);
+        mViewPager.addOnPageChangeListener(this);
+        setUiPageViewController();
 
         goToForecast();
 
@@ -90,6 +107,36 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged {
 
     }
 
+    private void setUiPageViewController() {
+
+        int dotsCount = mSectionsPagerAdapter.getCount();
+        dots = new ImageView[dotsCount];
+
+        for (int i = 0; i < dotsCount; i++) {
+            dots[i] = new ImageView(this);
+            dots[i].setClickable(true);
+            dots[i].setTag(i);
+            dots[i].setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mViewPager.setCurrentItem((int) v.getTag());
+                }
+            });
+            dots[i].setImageDrawable(getResources().getDrawable(R.drawable.nonselecteditem_dot));
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+
+            params.setMargins(4, 0, 4, 0);
+
+            pager_indicator.addView(dots[i], params);
+        }
+
+        dots[0].setImageDrawable(getResources().getDrawable(R.drawable.selecteditem_dot));
+    }
+
     public void setPlace(Place place) {
         if (place == null) {
             return;
@@ -103,8 +150,9 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged {
             subTitle = place.region.name(lang) + ", " + subTitle;
         }
 
-        toolbar.setTitle(title);
-        toolbar.setSubtitle(subTitle);
+        pageTitle.setText(title);
+        pageSubTitle.setText(subTitle);
+
 
         if (activeFragment != null) {
             activeFragment.placeChanged(place);
@@ -143,8 +191,8 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged {
             e.printStackTrace();
         }
         this.report = report;
-        if (this.activeFragment != null && ForecastReportFragment.class == this.activeFragment.getClass()) {
-            ((ForecastReportFragment) this.activeFragment).setForecastReport(report);
+        if (reportFragment != null && report != null) {
+            reportFragment.setForecastReport(report);
         }
     }
 
@@ -196,6 +244,28 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged {
     @Override
     public void placeChanged(Place place) {
         setPlace(place);
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        for (int i = 0; i < dots.length; i++) {
+            dots[i].setImageDrawable(getResources().getDrawable(R.drawable.nonselecteditem_dot));
+        }
+        dots[position].setImageDrawable(getResources().getDrawable(R.drawable.selecteditem_dot));
+        if (this.reportFragment != null && position == 1) {
+//            this.reportFragment.setForecastReport(report);
+            exploreForecast(place);
+        }
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
     }
 
     class PlaceTask extends AsyncTask<String, Void, Place> {
@@ -275,10 +345,10 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged {
                     fragment = placesFragment;
                     break;
                 case 1:
-                    ForecastReportFragment forecastReportFragment = new ForecastReportFragment();
-                    forecastReportFragment.placeChanged(place);
-                    forecastReportFragment.setForecastReport(report);
-                    fragment = forecastReportFragment;
+                    reportFragment = new ForecastReportFragment();
+                    reportFragment.placeChanged(place);
+                    reportFragment.setForecastReport(report);
+                    fragment = reportFragment;
                     break;
             }
 
