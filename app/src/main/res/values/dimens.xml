@@ -7,4 +7,5 @@
     <dimen name="text_margin">16dp</dimen>
     <dimen name="margin_default">5dp</dimen>
     <dimen name="padding_default">5dp</dimen>
+    <dimen name="h1_size">24sp</dimen>
 </resources>

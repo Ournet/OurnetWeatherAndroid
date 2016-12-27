@@ -11,6 +11,7 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Created by Dumitru Cantea on 12/22/16.

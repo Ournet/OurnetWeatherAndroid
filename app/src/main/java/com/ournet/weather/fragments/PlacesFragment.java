@@ -143,15 +143,27 @@ public class PlacesFragment extends BaseFragment {
 
             Place data = mUserPlaces.get().get(position);
 
-            if (data.isSelected) {
-                vi.setBackgroundColor(getResources().getColor(R.color.colorWhite));
-            }
-
             TextView textView = (TextView) vi.findViewById(R.id.listitem_place_name);
             textView.setText(Utils.name(data));
 
             textView = (TextView) vi.findViewById(R.id.listitem_place_region);
             textView.setText(Utils.regionName(data));
+
+            View deleteView = vi.findViewById(R.id.place_delete_icon);
+            deleteView.setTag(data);
+            if (data.isSelected) {
+                vi.setBackgroundColor(getResources().getColor(R.color.colorWhite));
+                deleteView.setVisibility(View.GONE);
+            } else {
+                deleteView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Place tag = (Place) v.getTag();
+                        mUserPlaces.removeById(tag.id);
+                        mPlacesAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
 
             return vi;
         }

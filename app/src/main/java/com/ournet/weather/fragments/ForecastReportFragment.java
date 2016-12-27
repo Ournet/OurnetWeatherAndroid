@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.HeaderViewListAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -17,6 +18,7 @@ import android.widget.WrapperListAdapter;
 
 import com.ournet.weather.MainActivity;
 import com.ournet.weather.R;
+import com.ournet.weather.Utils;
 import com.ournet.weather.data.ForecastReport;
 import com.ournet.weather.fragments.BaseFragment;
 
@@ -163,10 +165,18 @@ public class ForecastReportFragment extends BaseFragment {
                 textView.setText(time.windSpeed.toString());
                 textView = (TextView) row.findViewById(R.id.item_weather_report_time_pressure);
                 textView.setText(time.pressure.toString());
+                textView = (TextView) row.findViewById(R.id.item_weather_report_time_info);
+                textView.setText(Utils.weatherSymbolName(getResources(), time.symbol));
 
-                if (i == data.times.size() - 1) {
-                    row.findViewById(R.id.item_weather_report_time_separator).setVisibility(View.INVISIBLE);
-                }
+
+                ImageView imageView = (ImageView) row.findViewById(R.id.item_weather_report_time_image);
+                imageView.setImageDrawable(getResources().getDrawable(Utils.weatherIcon(time.symbol)));
+
+
+
+//                if (i == data.times.size() - 1) {
+//                    row.findViewById(R.id.item_weather_report_time_separator).setVisibility(View.INVISIBLE);
+//                }
 
                 containerView.addView(row);
             }

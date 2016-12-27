@@ -14,6 +14,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -46,6 +47,10 @@ public class UserPlaces {
     }
 
     public boolean add(int index, Place place) {
+        if (place.id == null || place.id < 0) {
+            Log.e("data", "Place id is invalid!");
+            return false;
+        }
         List<Place> places = get();
 
 //        removeById(place.id);
@@ -129,8 +134,15 @@ public class UserPlaces {
             return places;
         }
         JSONArray array = json.getJSONArray("places");
+        HashMap<Integer, Boolean> ids = new HashMap<>();
+//        ArrayList<Integer> ids=new ArrayList<>();
         for (int i = 0; i < array.length(); i++) {
-            places.add(i, Place.create(array.getJSONObject(i)));
+            Place place = Place.create(array.getJSONObject(i));
+            if (ids.get(place.id) == null && place.id != null) {
+                Log.i("data", "adding placeid="+place.id);
+                places.add(place);
+            }
+            ids.put(place.id, true);
         }
         return places;
     }

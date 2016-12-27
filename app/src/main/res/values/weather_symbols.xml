@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="weather_symbols">
+        <item>Sun</item>
+        <item>LightCloud</item>
+        <item>PartlyCloud</item>
+        <item>Cloud</item>
+        <item>LightRainSun</item>
+        <item>LightRainThunderSun</item>
+        <item>SleetSun</item>
+        <item>SnowSun</item>
+        <item>LightRain</item>
+        <item>Rain</item>
+        <item>RainThunder</item>
+        <item>Sleet</item>
+        <item>Snow</item>
+        <item>SnowThunder</item>
+        <item>Fog</item>
+        <item>SleetSunThunder</item>
+        <item>SnowSunThunder</item>
+        <item>LightRainThunder</item>
+        <item>SleetThunder</item>
+        <item>DrizzleThunderSun</item>
+        <item>RainThunderSun</item>
+        <item>LightSleetThunderSun</item>
+        <item>HeavySleetThunderSun</item>
+        <item>LightSnowThunderSun</item>
+        <item>HeavySnowThunderSun</item>
+        <item>DrizzleThunder</item>
+        <item>LightSleetThunder</item>
+        <item>HeavySleetThunder</item>
+        <item>LightSnowThunder</item>
+        <item>HeavySnowThunder</item>
+        <item>DrizzleSun</item>
+        <item>RainSun</item>
+        <item>LightSleetSun</item>
+        <item>HeavySleetSun</item>
+        <item>LightSnowSun</item>
+        <item>HeavySnowSun</item>
+        <item>Drizzle</item>
+        <item>LightSleet</item>
+        <item>HeavySleet</item>
+        <item>LightSnow</item>
+        <item>HeavySnow</item>
+    </string-array>
+    <string-array name="weather_symbol_names">
+        <item>Clear sky</item>
+        <item>Fair</item>
+        <item>Partly cloudy</item>
+        <item>Cloudy</item>
+        <item>Rain showers</item>
+        <item>Rain showers</item>
+        <item>Sleet</item>
+        <item>Snow</item>
+        <item>Rain showers</item>
+        <item>Rain</item>
+        <item>Rain</item>
+        <item>Sleet</item>
+        <item>Snow</item>
+        <item>Snow</item>
+        <item>Fog</item>
+        <item>Sleet</item>
+        <item>Snow</item>
+        <item>Light rain</item>
+        <item>Sleet</item>
+        <item>Drizzle</item>
+        <item>Rain</item>
+        <item>Light sleet</item>
+        <item>Heavy sleet</item>
+        <item>Light snow</item>
+        <item>Heavy snow</item>
+        <item>Drizzle</item>
+        <item>Light sleet</item>
+        <item>Heavy sleet</item>
+        <item>Light snow</item>
+        <item>Heavy snow</item>
+        <item>Drizzle</item>
+        <item>Rain</item>
+        <item>Light sleet</item>
+        <item>Heavy sleet</item>
+        <item>Light snow</item>
+        <item>Heavy snow</item>
+        <item>Drizzle</item>
+        <item>Light sleet</item>
+        <item>Heavy sleet</item>
+        <item>Light snow</item>
+        <item>Heavy snow</item>
+    </string-array>
+</resources>

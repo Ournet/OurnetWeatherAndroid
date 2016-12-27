@@ -61,7 +61,8 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged, V
     private ImageView[] dots;
     private TextView pageTitle;
     private TextView pageSubTitle;
-    private Button refreshButton;
+    private View refreshButton;
+    private View loadingIndicator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +71,8 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged, V
 
         pageTitle = (TextView) findViewById(R.id.appbar_title);
         pageSubTitle = (TextView) findViewById(R.id.appbar_subtitle);
-        refreshButton = (Button) findViewById(R.id.appbar_refresh_btn);
+        refreshButton = findViewById(R.id.appbar_refresh_btn);
+        loadingIndicator = findViewById(R.id.appbar_loading_indicator);
 
 //        toolbar = (Toolbar) findViewById(R.id.toolbar);
 //        setSupportActionBar(toolbar);
@@ -190,6 +192,7 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged, V
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
+
         this.report = report;
         if (reportFragment != null && report != null) {
             reportFragment.setForecastReport(report);

@@ -7,4 +7,5 @@
     <color name="colorLayoutDark">#d8d2c0</color>
     <color name="colorWhite">#ffffff</color>
     <color name="colorText">#333</color>
+    <color name="colorSimple">#777</color>
 </resources>
