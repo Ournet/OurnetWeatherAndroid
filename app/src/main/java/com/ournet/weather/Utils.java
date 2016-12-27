@@ -60,11 +60,14 @@ public class Utils {
             case 16:
                 return R.mipmap.wi_14;
         }
-        return 0;
+        return R.mipmap.wi_1;
     }
 
     public static String weatherSymbolName(Resources resources, int symbol) {
         String[] names = resources.getStringArray(R.array.weather_symbol_names);
-        return names[symbol + 1];
+        if (symbol > names.length-1) {
+            symbol = 1;
+        }
+        return names[symbol - 1];
     }
 }

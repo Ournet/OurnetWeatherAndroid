@@ -5,19 +5,28 @@
     android:clickable="false"
     android:orientation="vertical">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
-        android:padding="5dp">
+        android:padding="@dimen/padding_default"
+        >
 
         <TextView
             android:id="@+id/item_weather_report_day_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Date"
-            android:textColor="#ffffff" />
-    </LinearLayout>
+            android:text="@string/report_date"
+            android:textColor="#ffffff"
+ />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/report_wind"
+            android:textColor="#ffffff"
+            android:textSize="13sp"
+            android:layout_alignParentRight="true"/>
+    </RelativeLayout>
 
 
     <LinearLayout

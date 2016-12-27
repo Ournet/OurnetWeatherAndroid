@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="weather_symbol_names">
+        <item>Senin</item>
+        <item>Cer variabil</item>
+        <item>Parțial noros</item>
+        <item>Cer noros</item>
+        <item>Ploaie moderată</item>
+        <item>Ploaie moderată</item>
+        <item>Lapoviță</item>
+        <item>Ninsoare moderată</item>
+        <item>Ploaie moderată</item>
+        <item>Ploaie</item>
+        <item>Ploaie</item>
+        <item>Lapoviță</item>
+        <item>Ninsoare</item>
+        <item>Ninsoare</item>
+        <item>Ceață</item>
+        <item>Lapoviță</item>
+        <item>Ninsoare</item>
+        <item>Ploaie moderată</item>
+        <item>Lapoviță</item>
+        <item>Burniță</item>
+        <item>Ploaie</item>
+        <item>Ceață slabă</item>
+        <item>Ceață puternică</item>
+        <item>Ninsoare slabă</item>
+        <item>Ninsoare puternică</item>
+        <item>Burniță</item>
+        <item>Puțină lapoviță</item>
+        <item>Lapoviță</item>
+        <item>Puțină ninsoare</item>
+        <item>Ninsoare puternică</item>
+        <item>Burniță</item>
+        <item>Ploaie</item>
+        <item>Ceață slabă</item>
+        <item>Ceață puternică</item>
+        <item>Ninsoare moderată</item>
+        <item>Ninsoare puternică</item>
+        <item>Burniță</item>
+        <item>Puțină ceață</item>
+        <item>Ceață</item>
+        <item>Ninsoare slabă</item>
+        <item>Ninsoare puternică</item>
+    </string-array>
+</resources>

@@ -5,4 +5,6 @@
     <string name="loading">Loading...</string>
     <string name="weather_for_10days">10 Days Forecast</string>
     <string name="loading_dots">...</string>
+    <string name="report_date">Date</string>
+    <string name="report_wind">Wind, m/s</string>
 </resources>

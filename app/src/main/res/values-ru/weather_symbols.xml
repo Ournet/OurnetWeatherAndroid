@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="weather_symbol_names">
+        <item>Ясно</item>
+        <item>Малооблачно</item>
+        <item>Малооблачно</item>
+        <item>Облачно</item>
+        <item>Умеренный дождь</item>
+        <item>Умеренный дождь</item>
+        <item>Мокрый снег</item>
+        <item>Снег</item>
+        <item>Умеренный дождь</item>
+        <item>Дождь</item>
+        <item>Дождь</item>
+        <item>Мокрый снег</item>
+        <item>Снег</item>
+        <item>Снег</item>
+        <item>Туман</item>
+        <item>Мокрый снег</item>
+        <item>Снег</item>
+        <item>Умеренный дождь</item>
+        <item>Мокрый снег</item>
+        <item>Морось</item>
+        <item>Дождь</item>
+        <item>Мокрый снег</item>
+        <item>Мокрый снег</item>
+        <item>Небольшой снег</item>
+        <item>Снегопад</item>
+        <item>Морось</item>
+        <item>Мокрый снег</item>
+        <item>Мокрый снег</item>
+        <item>Небольшой снег</item>
+        <item>Снегопад</item>
+        <item>Морось</item>
+        <item>Дождь</item>
+        <item>Мокрый снег</item>
+        <item>Мокрый снег</item>
+        <item>Небольшой снег</item>
+        <item>Снегопад</item>
+        <item>Морось</item>
+        <item>Мокрый снег</item>
+        <item>Мокрый снег</item>
+        <item>Небольшой снег</item>
+        <item>Снегопад</item>
+    </string-array>
+</resources>
