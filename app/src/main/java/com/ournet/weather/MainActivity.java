@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -12,11 +11,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -31,10 +27,12 @@ import com.ournet.weather.fragments.PlacesFragment;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class MainActivity extends AppCompatActivity implements OnPlaceChanged, ViewPager.OnPageChangeListener {
+public class MainActivity extends AppCompatActivity implements OnPlaceChanged, ViewPager.OnPageChangeListener, OnLoadingTask {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -45,10 +43,6 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged, V
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
-    private Forecast forecast;
-    private ForecastReport report;
-    private BaseFragment activeFragment;
-    private ForecastReportFragment reportFragment;
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -74,26 +68,16 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged, V
         refreshButton = findViewById(R.id.appbar_refresh_btn);
         loadingIndicator = findViewById(R.id.appbar_loading_indicator);
 
-//        toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        // Set up the ViewPager with the sections adapter.
+
         mViewPager = (ViewPager) findViewById(R.id.viewPager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         pager_indicator = (LinearLayout) findViewById(R.id.viewPagerCountDots);
         mViewPager.addOnPageChangeListener(this);
+
         setUiPageViewController();
-
-        goToForecast();
-
-        this.places = new UserPlaces(this);
-        this.forecast = new Forecast(this);
-
-        explorePlace();
 
 //        mViewPager.addOnPageChangeListener();
 
@@ -145,22 +129,11 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged, V
         }
         this.place = place;
 
-        String lang = Settings.language();
-        String title = place.name(lang);
-        String subTitle = place.country_code.toUpperCase();
-        if (place.region != null) {
-            subTitle = place.region.name(lang) + ", " + subTitle;
-        }
+        String title = Utils.name(place);
+        String subTitle = Utils.regionName(place);
 
         pageTitle.setText(title);
         pageSubTitle.setText(subTitle);
-
-
-        if (activeFragment != null) {
-            activeFragment.placeChanged(place);
-        }
-
-        exploreForecast(place);
     }
 
     public void goToForecast() {
@@ -171,82 +144,19 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged, V
         mViewPager.setCurrentItem(0);
     }
 
-    public void refreshForecast() {
-        exploreForecast(place, new Date());
-    }
-
-    private void exploreForecast(Place place) {
-        exploreForecast(place, null);
-    }
-
-    private void exploreForecast(Place place, Date date) {
-        ForecastReport report = null;
-        try {
-            if (date != null) {
-                report = new ReportTask().execute(place, date.getTime()).get();
-            } else {
-                report = new ReportTask().execute(place).get();
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        this.report = report;
-        if (reportFragment != null && report != null) {
-            reportFragment.setForecastReport(report);
-        }
-    }
-
-    private void explorePlace() {
-//        ConnectivityManager connMgr = (ConnectivityManager)
-//                getSystemService(Context.CONNECTIVITY_SERVICE);
-//        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-//        if (networkInfo != null && networkInfo.isConnected()) {
-//            // fetch data
-//        } else {
-//            // display error
-//        }
-        Place place = places.getSelected();
-        if (place == null) {
-            try {
-                place = new PlaceTask().execute().get();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            }
-            if (place != null) {
-                this.places.setSelected(place);
-            }
-        }
-
-        if (place == null) {
-            goToPlaces();
-        } else {
-            setPlace(place);
-        }
-    }
-
-    public void onClickMoreForecast(View v) {
-        String url = Links.Weather.place(place.country_code, place.id);
-        if (url == null) {
-            Log.e("main", "NO url: " + place.country_code);
-        } else {
-            Log.e("main", "Starging browser url: " + url);
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            startActivity(browserIntent);
-        }
-    }
-
     public void onClickRefreshForecast(View v) {
-        refreshForecast();
+//        refreshButton.setVisibility(View.GONE);
+//        refreshButton.setClickable(false);
+        mSectionsPagerAdapter.getForecastReportFragment().refreshForecastForecast();
+//        refreshButton.setClickable(true);
+//        refreshButton.setVisibility(View.VISIBLE);
+//        refreshButton.setEnabled(true);
     }
 
     @Override
-    public void placeChanged(Place place) {
+    public void onPlaceChanged(Place place) {
         setPlace(place);
+        goToForecast();
     }
 
     @Override
@@ -260,10 +170,6 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged, V
             dots[i].setImageDrawable(getResources().getDrawable(R.drawable.nonselecteditem_dot));
         }
         dots[position].setImageDrawable(getResources().getDrawable(R.drawable.selecteditem_dot));
-        if (this.reportFragment != null && position == 1) {
-//            this.reportFragment.setForecastReport(report);
-            exploreForecast(place);
-        }
     }
 
     @Override
@@ -271,38 +177,14 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged, V
 
     }
 
-    class PlaceTask extends AsyncTask<String, Void, Place> {
-
-        @Override
-        protected Place doInBackground(String... params) {
-            try {
-                return Settings.exploreSelectedPlace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
+    @Override
+    public void onStartLoadingTask() {
+//        refreshButton.setClickable(false);
     }
 
-    class ReportTask extends AsyncTask<Object, Void, ForecastReport> {
-
-        @Override
-        protected ForecastReport doInBackground(Object... params) {
-            try {
-                Date date = null;
-                if (params.length > 1 && params[1] != null) {
-                    date = new Date((long) params[1]);
-                }
-                return forecast.getReport((ILocation) params[0], date);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
+    @Override
+    public void onEndLoadingTask() {
+//        refreshButton.setClickable(true);
     }
 
     //    @Override
@@ -333,31 +215,38 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged, V
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
+        PlacesFragment placesFragment;
+        ForecastReportFragment forecastReportFragment;
+
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
+        public ForecastReportFragment getForecastReportFragment() {
+            return forecastReportFragment;
+        }
+
         @Override
         public Fragment getItem(int position) {
-            BaseFragment fragment = null;
             switch (position) {
                 case 0:
-                    PlacesFragment placesFragment = new PlacesFragment();
-                    placesFragment.placeChanged(place);
-                    placesFragment.setPlaces(places);
-                    fragment = placesFragment;
-                    break;
+                    if (placesFragment == null) {
+                        placesFragment = new PlacesFragment();
+                        placesFragment.addOnLoadingTasks(MainActivity.this);
+                        placesFragment.addOnPlaceChanged(MainActivity.this);
+                    }
+                    return placesFragment;
+
                 case 1:
-                    reportFragment = new ForecastReportFragment();
-                    reportFragment.placeChanged(place);
-                    reportFragment.setForecastReport(report);
-                    fragment = reportFragment;
-                    break;
+                    if (forecastReportFragment == null) {
+                        forecastReportFragment = new ForecastReportFragment();
+                        forecastReportFragment.addOnLoadingTasks(MainActivity.this);
+                        placesFragment.addOnPlaceChanged(forecastReportFragment);
+                    }
+                    return forecastReportFragment;
             }
 
-            activeFragment = fragment;
-
-            return fragment;
+            return null;
         }
 
         @Override

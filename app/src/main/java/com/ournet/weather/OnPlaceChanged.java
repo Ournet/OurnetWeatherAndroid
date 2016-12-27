@@ -7,5 +7,5 @@ import com.ournet.weather.data.Place;
  */
 
 public interface OnPlaceChanged {
-    public void placeChanged(Place place);
+    void onPlaceChanged(Place place);
 }

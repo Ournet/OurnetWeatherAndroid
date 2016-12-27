@@ -65,14 +65,19 @@
                     android:textColor="@color/colorSimple" />
             </LinearLayout>
 
-            <ImageView
+            <Button
                 android:id="@+id/appbar_refresh_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@drawable/refresh_btn_background"
                 android:layout_gravity="center_vertical"
                 android:onClick="onClickRefreshForecast"
                 android:layout_alignParentRight="true"
-                app:srcCompat="@android:drawable/ic_popup_sync" />
+                android:textAlignment="center"
+                android:gravity="center_horizontal|center_vertical"
+                android:text="@string/loading_dots"
+
+                />
 
             <ProgressBar
                 android:id="@+id/appbar_loading_indicator"
@@ -80,8 +85,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_alignParentRight="true"
-                android:indeterminate="true"
-                android:visibility="gone" />
+                android:background="@drawable/refresh_btn"
+                android:visibility="gone"/>
         </RelativeLayout>
 
         <android.support.v4.view.ViewPager

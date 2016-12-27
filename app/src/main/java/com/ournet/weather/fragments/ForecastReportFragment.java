@@ -2,6 +2,9 @@ package com.ournet.weather.fragments;
 
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,40 +19,101 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.WrapperListAdapter;
 
+import com.ournet.weather.Forecast;
+import com.ournet.weather.Links;
 import com.ournet.weather.MainActivity;
+import com.ournet.weather.OnForecastReportChanged;
+import com.ournet.weather.OnPlaceChanged;
 import com.ournet.weather.R;
 import com.ournet.weather.Utils;
 import com.ournet.weather.data.ForecastReport;
+import com.ournet.weather.data.ILocation;
+import com.ournet.weather.data.Place;
 import com.ournet.weather.fragments.BaseFragment;
 
+import org.json.JSONException;
+
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by user on 12/22/16.
  */
 
-public class ForecastReportFragment extends BaseFragment {
+public class ForecastReportFragment extends BaseFragment implements OnPlaceChanged {
     ForecastReport report;
     ForecastDaysAdapter forecastAdapter;
     ListView listView = null;
+    Forecast forecast;
 
-    public void setForecastReport(ForecastReport report) {
-        Log.i("adapter", "set report");
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_forecastreport, container, false);
+
+        listView = (ListView) rootView.findViewById(R.id.fragment_forecastreport_list);
+        View footerView = inflater.inflate(R.layout.forecast_footer, container, false);
+        TextView textView = (TextView) footerView.findViewById(R.id.forecast_footer_text);
+
+        this.forecast = new Forecast(getContext());
+
+        ForecastDaysAdapter forecastAdapter = new ForecastDaysAdapter(this.getContext());
+        this.forecastAdapter = forecastAdapter;
+
+        listView.setAdapter(forecastAdapter);
+
+        listView.addFooterView(footerView);
+
+        textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickMoreForecast(v);
+            }
+        });
+
+        if (mPlace != null) {
+            exploreForecast(mPlace, null);
+        }
+
+        return rootView;
+    }
+
+    @Override
+    public void onPlaceChanged(Place place) {
+        super.onPlaceChanged(place);
+
+        if (forecast != null) {
+            exploreForecast(place, null);
+        }
+    }
+
+    private void exploreForecast(Place place, Date date) {
+        onStartLoadingTask();
+
+        ForecastReport report = null;
+        try {
+            if (date != null) {
+                report = new ReportTask().execute(place, date.getTime()).get();
+            } else {
+                report = new ReportTask().execute(place).get();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
         this.report = report;
 
         if (report != null) {
-//            String timezone = report.timezone == null ? mPlace.timezone : report.timezone;
             Calendar calendar = new GregorianCalendar();
-//            if (timezone != null) {
-//                calendar.setTimeZone(TimeZone.getTimeZone(timezone));
-//            } else {
-//                Log.w("data", "Timezone is null");
-//            }
             ForecastReport.DayReport firstDay = report.days.get(0);
             long currentTime = calendar.getTimeInMillis();
             Log.i("data", "currentDate=" + calendar.getTime());
@@ -69,42 +133,27 @@ public class ForecastReportFragment extends BaseFragment {
         }
 
         if (forecastAdapter != null) {
-            forecastAdapter.notifyDataSetChanged();
+//            Log.i("forecast", "notifyDataSetInvalidated");
+//            forecastAdapter.notifyDataSetChanged();
+            forecastAdapter.notifyDataSetInvalidated();
         }
 
-        if (listView != null) {
-//            listView.setSelection(0);
-//            listView.setSelectionAfterHeaderView();
-
-//            Log.i("view", "setViewData position 0");
-        }
+        onEndLoadingTask();
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_forecastreport, container, false);
+    public void refreshForecastForecast() {
+        exploreForecast(mPlace, new Date());
+    }
 
-        listView = (ListView) rootView.findViewById(R.id.fragment_forecastreport_list);
-        View footerView = inflater.inflate(R.layout.forecast_footer, container, false);
-        TextView textView = (TextView) footerView.findViewById(R.id.forecast_footer_text);
-
-        ForecastDaysAdapter forecastAdapter = new ForecastDaysAdapter(this.getContext());
-        this.forecastAdapter = forecastAdapter;
-
-        listView.setAdapter(forecastAdapter);
-//        listView.setSelection(0);
-//        Log.i("setSelection", "aici");
-
-        listView.addFooterView(footerView);
-
-        textView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((MainActivity) getActivity()).onClickMoreForecast(v);
-            }
-        });
-        return rootView;
+    public void onClickMoreForecast(View v) {
+        String url = Links.Weather.place(mPlace.country_code, mPlace.id);
+        if (url == null) {
+            Log.e("main", "NO url: " + mPlace.country_code);
+        } else {
+            Log.e("main", "Starging browser url: " + url);
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(browserIntent);
+        }
     }
 
     class ForecastDaysAdapter extends BaseAdapter {
@@ -141,10 +190,11 @@ public class ForecastReportFragment extends BaseFragment {
         public View getView(int position, View convertView, ViewGroup parent) {
             // TODO Auto-generated method stub
             View vi = convertView;
-//            if (vi == null) {
-            vi = inflater.inflate(R.layout.item_weather_report_day, null);
-//            }
+            if (vi == null) {
+                vi = inflater.inflate(R.layout.item_weather_report_day, null);
+            }
             LinearLayout containerView = (LinearLayout) vi.findViewById(R.id.item_weather_report_day_container);
+            containerView.removeAllViews();
 
             ForecastReport.DayReport data = report.days.get(position);
 
@@ -172,17 +222,30 @@ public class ForecastReportFragment extends BaseFragment {
                 ImageView imageView = (ImageView) row.findViewById(R.id.item_weather_report_time_image);
                 imageView.setImageDrawable(getResources().getDrawable(Utils.weatherIcon(time.symbol)));
 
-
-
-//                if (i == data.times.size() - 1) {
-//                    row.findViewById(R.id.item_weather_report_time_separator).setVisibility(View.INVISIBLE);
-//                }
-
                 containerView.addView(row);
             }
 
             return vi;
         }
 
+    }
+
+    class ReportTask extends AsyncTask<Object, Void, ForecastReport> {
+
+        @Override
+        protected ForecastReport doInBackground(Object... params) {
+            try {
+                if (params.length > 1 && params[1] != null) {
+                    Date date = new Date((long) params[1]);
+                    return forecast.getReport((ILocation) params[0], date);
+                }
+                return forecast.getReport((ILocation) params[0]);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
     }
 }

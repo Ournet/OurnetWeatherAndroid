@@ -1,24 +1,22 @@
 package com.ournet.weather.fragments;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.ournet.weather.MainActivity;
+import com.ournet.weather.OnPlaceChanged;
 import com.ournet.weather.R;
 import com.ournet.weather.Settings;
 import com.ournet.weather.UserPlaces;
 import com.ournet.weather.Utils;
-import com.ournet.weather.data.ForecastReport;
 import com.ournet.weather.data.OurnetApi;
 import com.ournet.weather.data.Place;
 import com.ournet.weather.ui.DelayAutoCompleteTextView;
@@ -26,8 +24,9 @@ import com.ournet.weather.ui.DelayAutoCompleteTextView;
 import org.json.JSONException;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by Dumitru Cantea on 12/23/16.
@@ -36,20 +35,23 @@ import java.util.Locale;
 public class PlacesFragment extends BaseFragment {
     PlacesAdapter mPlacesAdapter;
     UserPlaces mUserPlaces;
+    List<OnPlaceChanged> onPlaceChangedList = new ArrayList();
 
-    public void setPlaces(UserPlaces userPlaces) {
-        this.mUserPlaces = userPlaces;
-    }
 
     @Override
-    public void placeChanged(Place place) {
-        super.placeChanged(place);
+    public void onPlaceChanged(Place place) {
+        super.onPlaceChanged(place);
+
         updateListView();
+
+        for (OnPlaceChanged placeChanged : onPlaceChangedList) {
+            placeChanged.onPlaceChanged(place);
+        }
     }
 
     void updateListView() {
         if (this.mPlacesAdapter != null) {
-            this.mPlacesAdapter.notifyDataSetChanged();
+            this.mPlacesAdapter.notifyDataSetInvalidated();
         }
     }
 
@@ -58,9 +60,9 @@ public class PlacesFragment extends BaseFragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_places, container, false);
 
-        ListView listView = (ListView) rootView.findViewById(R.id.places_listview);
+        mUserPlaces = new UserPlaces(getContext());
 
-//        final LayoutInflater inflater1=inflater;
+        ListView listView = (ListView) rootView.findViewById(R.id.places_listview);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -69,9 +71,7 @@ public class PlacesFragment extends BaseFragment {
                 if (place != null) {
                     mUserPlaces.setSelected(place);
 
-                    MainActivity activity = ((MainActivity) getActivity());
-                    activity.goToForecast();
-                    activity.placeChanged(place);
+                    onPlaceChanged(place);
                 }
             }
         });
@@ -93,15 +93,52 @@ public class PlacesFragment extends BaseFragment {
                 if (place != null) {
                     placeTitle.setText(Utils.name(place));
                     mUserPlaces.setSelected(place);
-                    placeChanged(place);
-
-//                    InputMethodManager imm = (InputMethodManager)inflater1.getSystemService(Context.INPUT_METHOD_SERVICE);
-//                    imm.hideSoftInputFromWindow(placeTitle.getWindowToken(), 0);
+                    onPlaceChanged(place);
                 }
             }
         });
 
+        explorePlace();
+
         return rootView;
+    }
+
+    public void addOnPlaceChanged(OnPlaceChanged placeChanged) {
+        onPlaceChangedList.add(placeChanged);
+    }
+
+    private void explorePlace() {
+        onStartLoadingTask();
+
+//        ConnectivityManager connMgr = (ConnectivityManager)
+//                getSystemService(Context.CONNECTIVITY_SERVICE);
+//        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+//        if (networkInfo != null && networkInfo.isConnected()) {
+//            // fetch data
+//        } else {
+//            // display error
+//        }
+        Place place = mUserPlaces.getSelected();
+        if (place == null) {
+            try {
+                place = new PlaceTask().execute().get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+            if (place != null) {
+                mUserPlaces.setSelected(place);
+            }
+        }
+
+        onEndLoadingTask();
+
+        if (place == null) {
+//            goToPlaces();
+        } else {
+            onPlaceChanged(place);
+        }
     }
 
     class PlacesAdapter extends BaseAdapter {
@@ -168,5 +205,20 @@ public class PlacesFragment extends BaseFragment {
             return vi;
         }
 
+    }
+
+    class PlaceTask extends AsyncTask<String, Void, Place> {
+
+        @Override
+        protected Place doInBackground(String... params) {
+            try {
+                return Settings.exploreSelectedPlace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
     }
 }
