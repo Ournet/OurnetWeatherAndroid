@@ -34,16 +34,16 @@ public class Forecast {
 
         report = ForecastReport.load(this.context, location);
         if (report != null) {
-            if (report.updatedAt.getTime() > minDate.getTime()) {
-                Log.i("data", "got forecast from cache file");
+            if (report.fromCache && report.updatedAt.getTime() > minDate.getTime()) {
+                Log.i("data", "got forecast from cache file: "+report.updatedAt);
                 return report;
             }
         }
 
-        Log.i("data", "Getting forecast from API");
+//        Log.i("data", "Getting forecast from API");
 
         OurnetApi.ForecastDetails details = new OurnetApi.ForecastDetails();
-        details.days = 5;
+        details.days = 6;
         report = OurnetApi.getForecast(location, details);
 
         if (report != null) {
@@ -58,7 +58,7 @@ public class Forecast {
     }
 
     static Date defaultMinDate() {
-        // 3 hours
-        return new Date(new Date().getTime() - 1000 * 60 * 60 * 3);
+        // 2 hours
+        return new Date(new Date().getTime() - 1000 * 60 * 60 * 2);
     }
 }

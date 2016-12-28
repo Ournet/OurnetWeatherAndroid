@@ -11,6 +11,7 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.ournet.weather.MainActivity;
 import com.ournet.weather.OnPlaceChanged;
 import com.ournet.weather.R;
@@ -134,11 +135,8 @@ public class PlacesFragment extends BaseFragment {
 
         onEndLoadingTask();
 
-        if (place == null) {
-//            goToPlaces();
-        } else {
-            onPlaceChanged(place);
-        }
+        onPlaceChanged(place);
+
     }
 
     class PlacesAdapter extends BaseAdapter {

@@ -7,6 +7,7 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -72,13 +73,6 @@ public class ForecastReportFragment extends BaseFragment implements OnPlaceChang
 
         listView.addFooterView(footerView);
 
-        textView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onClickMoreForecast(v);
-            }
-        });
-
         if (mPlace != null) {
             exploreForecast(mPlace, null);
         }
@@ -112,24 +106,34 @@ public class ForecastReportFragment extends BaseFragment implements OnPlaceChang
         }
 
         this.report = report;
-
-        if (report != null) {
+        if (report == null) {
+            snackbar(R.string.error_on_getting_forecast);
+        } else {
             Calendar calendar = new GregorianCalendar();
-            ForecastReport.DayReport firstDay = report.days.get(0);
+
             long currentTime = calendar.getTimeInMillis();
             Log.i("data", "currentDate=" + calendar.getTime());
-            ArrayList<ForecastReport.TimeReport> timesToRemove = new ArrayList();
+            ArrayList<ForecastReport.DayReport> daysToRemove = new ArrayList();
+            for (ForecastReport.DayReport firstDay : report.days) {
+                ArrayList<ForecastReport.TimeReport> timesToRemove = new ArrayList();
 
-            for (ForecastReport.TimeReport time : firstDay.times) {
-                if (time.date.getTime() < currentTime) {
-                    timesToRemove.add(time);
+                for (ForecastReport.TimeReport time : firstDay.times) {
+                    if (time.date.getTime() < currentTime) {
+                        timesToRemove.add(time);
+                    }
+                }
+                for (ForecastReport.TimeReport time : timesToRemove) {
+                    firstDay.times.remove(time);
+                    Log.i("data", "removed time" + time.date);
+                }
+                if (firstDay.times.size() == 0) {
+                    daysToRemove.add(firstDay);
+                } else {
+                    break;
                 }
             }
-            for (ForecastReport.TimeReport time : timesToRemove) {
-                firstDay.times.remove(time);
-            }
-            if (firstDay.times.size() == 0) {
-                report.days.remove(firstDay);
+            for (ForecastReport.DayReport day : daysToRemove) {
+                report.days.remove(day);
             }
         }
 
@@ -144,17 +148,6 @@ public class ForecastReportFragment extends BaseFragment implements OnPlaceChang
 
     public void refreshForecastForecast() {
         exploreForecast(mPlace, new Date());
-    }
-
-    public void onClickMoreForecast(View v) {
-        String url = Links.Weather.place(mPlace.country_code, mPlace.id);
-        if (url == null) {
-            Log.e("main", "NO url: " + mPlace.country_code);
-        } else {
-            Log.e("main", "Starging browser url: " + url);
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            startActivity(browserIntent);
-        }
     }
 
     class ForecastDaysAdapter extends BaseAdapter {

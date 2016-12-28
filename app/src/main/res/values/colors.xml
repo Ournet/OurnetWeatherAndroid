@@ -6,6 +6,7 @@
     <color name="colorLayout">#f2f0ea</color>
     <color name="colorLayoutDark">#d8d2c0</color>
     <color name="colorWhite">#ffffff</color>
-    <color name="colorText">#333</color>
+    <color name="colorTextPrimary">#333</color>
+    <color name="colorTextSecondary">#777</color>
     <color name="colorSimple">#777</color>
 </resources>

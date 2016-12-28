@@ -56,13 +56,14 @@
                     android:id="@+id/appbar_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/colorTextPrimary"
                     android:textSize="@dimen/h1_size" />
 
                 <TextView
                     android:id="@+id/appbar_subtitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/colorSimple" />
+                    android:textColor="@color/colorTextSecondary" />
             </LinearLayout>
 
             <Button
@@ -146,6 +147,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
+        app:srcCompat="@android:drawable/ic_dialog_email"
+        android:visibility="gone"/>
 
 </android.support.design.widget.CoordinatorLayout>

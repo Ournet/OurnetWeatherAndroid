@@ -22,16 +22,21 @@ public class ForecastReport {
     public String timezone;
     public Date updatedAt;
     private JSONObject json = null;
+    public boolean fromCache;
 
     public static ForecastReport create(JSONObject json) throws JSONException {
         ForecastReport report = new ForecastReport();
         report.json = json;
 
         if (json.has("updatedAt")) {
+            report.fromCache = true;
+            Log.i("data", "has updatedAt");
             report.updatedAt = new Date(json.getLong("updatedAt"));
         } else {
+            Log.i("data", "NO updatedAt");
             report.updatedAt = new Date();
             json.put("updatedAt", report.updatedAt.getTime());
+            report.fromCache = false;
         }
 
         if (json.has("timezone")) {
@@ -111,7 +116,6 @@ public class ForecastReport {
     }
 
     public boolean save(Context context, ILocation location) {
-
         try {
             return FileStorage.save(context, fileName(location), this.json);
         } catch (IOException e) {
@@ -121,12 +125,11 @@ public class ForecastReport {
     }
 
     public static ForecastReport load(Context context, ILocation location) {
-        JSONObject json;
         try {
-            json = FileStorage.loadJson(context, fileName(location));
+            JSONObject json = FileStorage.loadJson(context, fileName(location));
             return ForecastReport.create(json);
         } catch (IOException e) {
-            return null;
+//            e.printStackTrace();
         } catch (JSONException e) {
             e.printStackTrace();
         }

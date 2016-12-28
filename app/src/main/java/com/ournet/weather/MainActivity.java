@@ -3,6 +3,7 @@ package com.ournet.weather;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 
 import android.support.v4.app.Fragment;
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged, V
         setContentView(R.layout.activity_main);
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        mFirebaseAnalytics.setAnalyticsCollectionEnabled(true);
 
         pageTitle = (TextView) findViewById(R.id.appbar_title);
         pageSubTitle = (TextView) findViewById(R.id.appbar_subtitle);
@@ -157,15 +159,34 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged, V
 //        refreshButton.setEnabled(true);
     }
 
+    public void logEvent(String name, Bundle bundle) {
+        mFirebaseAnalytics.logEvent(name, bundle);
+    }
+
     @Override
     public void onPlaceChanged(Place place) {
         setPlace(place);
 
-        if (place != null) {
+        if (place == null) {
+            snackbar(R.string.error_on_getting_user_place);
+        } else {
             mFirebaseAnalytics.setUserProperty("placeId", place.id.toString());
             mFirebaseAnalytics.setUserProperty("placeName", place.name);
             mFirebaseAnalytics.setUserProperty("country_code", place.country_code);
         }
+
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.ITEM_CATEGORY, "place");
+        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "placeId");
+        if (place == null) {
+            bundle.putString(FirebaseAnalytics.Param.ITEM_ID, "null");
+            bundle.putString(FirebaseAnalytics.Param.VALUE, "no-place");
+        } else {
+            bundle.putString(FirebaseAnalytics.Param.ITEM_ID, place.id.toString());
+            bundle.putString(FirebaseAnalytics.Param.VALUE, place.id.toString());
+        }
+
+        logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
 
         goToForecast();
     }
@@ -196,6 +217,21 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged, V
     @Override
     public void onEndLoadingTask() {
 //        refreshButton.setClickable(true);
+    }
+
+    public void snackbar(int resource) {
+        Snackbar.make(mViewPager, resource, Snackbar.LENGTH_LONG).show();
+    }
+
+    public void onClickMoreForecast(View v) {
+        String url = Links.Weather.place(place.country_code, place.id);
+        if (url == null) {
+            Log.e("main", "NO url: " + place.country_code);
+        } else {
+            Log.e("main", "Starging browser url: " + url);
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(browserIntent);
+        }
     }
 
     //    @Override
