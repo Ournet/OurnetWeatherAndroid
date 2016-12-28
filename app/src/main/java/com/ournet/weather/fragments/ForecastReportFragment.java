@@ -3,6 +3,7 @@ package com.ournet.weather.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -202,6 +203,8 @@ public class ForecastReportFragment extends BaseFragment implements OnPlaceChang
             SimpleDateFormat dformat = new SimpleDateFormat("E, d MMM", Locale.getDefault());
             dateView.setText(dformat.format(data.date));
 
+            Resources resources = getResources();
+
             for (int i = 0; i < data.times.size(); i++) {
                 View row = inflater.inflate(R.layout.item_weather_report_time, null);
                 ForecastReport.TimeReport time = data.times.get(i);
@@ -212,11 +215,11 @@ public class ForecastReportFragment extends BaseFragment implements OnPlaceChang
                 textView = (TextView) row.findViewById(R.id.item_weather_report_time_temperature);
                 textView.setText(String.valueOf(time.temperature.intValue()) + "°");
                 textView = (TextView) row.findViewById(R.id.item_weather_report_time_wind_speed);
-                textView.setText(time.windSpeed.toString());
+                textView.setText(time.windSpeed.toString() + " " + resources.getString(R.string.report_wind_ms));
                 textView = (TextView) row.findViewById(R.id.item_weather_report_time_pressure);
                 textView.setText(time.pressure.toString());
                 textView = (TextView) row.findViewById(R.id.item_weather_report_time_info);
-                textView.setText(Utils.weatherSymbolName(getResources(), time.symbol));
+                textView.setText(Utils.weatherSymbolName(resources, time.symbol));
 
 
                 ImageView imageView = (ImageView) row.findViewById(R.id.item_weather_report_time_image);

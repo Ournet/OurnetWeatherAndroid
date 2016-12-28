@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.ournet.weather.data.ForecastReport;
 import com.ournet.weather.data.ILocation;
 import com.ournet.weather.data.Place;
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged, V
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -62,6 +64,8 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged, V
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         pageTitle = (TextView) findViewById(R.id.appbar_title);
         pageSubTitle = (TextView) findViewById(R.id.appbar_subtitle);
@@ -156,6 +160,13 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged, V
     @Override
     public void onPlaceChanged(Place place) {
         setPlace(place);
+
+        if (place != null) {
+            mFirebaseAnalytics.setUserProperty("placeId", place.id.toString());
+            mFirebaseAnalytics.setUserProperty("placeName", place.name);
+            mFirebaseAnalytics.setUserProperty("country_code", place.country_code);
+        }
+
         goToForecast();
     }
 
