@@ -117,7 +117,7 @@ public class ForecastReport {
 
     public boolean save(Context context, ILocation location) {
         try {
-            return FileStorage.save(context, fileName(location), this.json);
+            return TempFileStorage.save(context, fileName(location), this.json);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -126,7 +126,7 @@ public class ForecastReport {
 
     public static ForecastReport load(Context context, ILocation location) {
         try {
-            JSONObject json = FileStorage.loadJson(context, fileName(location));
+            JSONObject json = TempFileStorage.loadJson(context, fileName(location));
             return ForecastReport.create(json);
         } catch (IOException e) {
 //            e.printStackTrace();

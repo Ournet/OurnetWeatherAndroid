@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Meteo</string>
+    <string name="action_settings">Setări</string>
+    <string name="loading">Se încarcă...</string>
+    <string name="weather_for_10days">Vremea pentru 10 zile</string>
+    <string name="loading_dots">...</string>
+    <string name="report_date">Data</string>
+    <string name="report_wind">Vânt</string>
+    <string name="report_wind_ms">m/s</string>
+    <string name="error_on_getting_user_place">Nu putem identifica locația dvs.</string>
+    <string name="error_on_getting_forecast">Eroare de rețea.</string>
+</resources>
