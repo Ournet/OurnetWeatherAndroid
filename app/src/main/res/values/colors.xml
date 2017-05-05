@@ -2,11 +2,13 @@
 <resources>
     <color name="colorPrimary">#2199e8</color>
     <color name="colorPrimaryDark">#303F9F</color>
+
     <color name="colorAccent">#cb5800</color>
     <color name="colorLayout">#f2f0ea</color>
     <color name="colorLayoutDark">#d8d2c0</color>
     <color name="colorWhite">#ffffff</color>
     <color name="colorTextPrimary">#333</color>
     <color name="colorTextSecondary">#777</color>
+    <color name="colorTextPrimaryInverse">#ffffff</color>
     <color name="colorSimple">#777</color>
 </resources>

@@ -47,7 +47,7 @@ public class UserPlaces {
     }
 
     public boolean add(int index, Place place) {
-        if (place.id == null || place.id < 0) {
+        if (place == null || place.id == null || place.id < 0 || place.getJson() == null) {
             Log.e("data", "Place id is invalid!");
             return false;
         }
@@ -91,9 +91,13 @@ public class UserPlaces {
 
     public boolean setSelected(Place place) {
 
+        Log.i("places", place.getJson().toString());
+
         add(place);
 
         List<Place> places = get();
+
+        Log.i("places", places.toString());
 
         try {
             for (Place p : places) {
@@ -138,8 +142,12 @@ public class UserPlaces {
 //        ArrayList<Integer> ids=new ArrayList<>();
         for (int i = 0; i < array.length(); i++) {
             Place place = Place.create(array.getJSONObject(i));
+            if (place == null) {
+                Log.i("data", "inavlid place");
+                continue;
+            }
             if (ids.get(place.id) == null && place.id != null) {
-                Log.i("data", "adding placeid="+place.id);
+                Log.i("data", "adding placeid=" + place.id);
                 places.add(place);
             }
             ids.put(place.id, true);
@@ -184,6 +192,6 @@ public class UserPlaces {
     }
 
     private static String fileName() {
-        return "places";
+        return "places-v0";
     }
 }

@@ -30,12 +30,12 @@ public class ForecastReport {
 
         if (json.has("updatedAt")) {
             report.fromCache = true;
-            Log.i("data", "has updatedAt");
+//            Log.i("data", "has updatedAt");
             report.updatedAt = new Date(json.getLong("updatedAt"));
         } else {
             Log.i("data", "NO updatedAt");
             report.updatedAt = new Date();
-            json.put("updatedAt", report.updatedAt.getTime());
+//            json.put("updatedAt", report.updatedAt.getTime());
             report.fromCache = false;
         }
 

@@ -28,7 +28,7 @@ public class Place implements ILocation {
     private Map<String, String> names = new HashMap();
 
     public Place() {
-
+        this.json = new JSONObject();
     }
 
     public Place(Double longitude, Double latitude) {
@@ -45,12 +45,15 @@ public class Place implements ILocation {
     }
 
     public static ArrayList<Place> create(JSONArray data) throws JSONException {
-        ArrayList<Place> list=new ArrayList();
-        if (data == null || data.length()==0) {
+        ArrayList<Place> list = new ArrayList();
+        if (data == null || data.length() == 0) {
             return list;
         }
-        for (int i=0;i<data.length();i++){
-            list.add(Place.create(data.getJSONObject(i)));
+        for (int i = 0; i < data.length(); i++) {
+            Place place = Place.create(data.getJSONObject(i));
+            if (place != null) {
+                list.add(place);
+            }
         }
 
         return list;
@@ -63,7 +66,7 @@ public class Place implements ILocation {
         Place place = new Place();
         place.json = data;
 
-        Log.i("place", data.toString());
+//        Log.i("place", data.toString());
 
         try {
             place.name = data.getString("name");

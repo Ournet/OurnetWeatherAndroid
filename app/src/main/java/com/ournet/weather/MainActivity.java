@@ -220,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged, V
     }
 
     public void snackbar(int resource) {
-        Snackbar.make(mViewPager, resource, Snackbar.LENGTH_LONG).show();
+        Snackbar.make(mViewPager, resource, Snackbar.LENGTH_LONG).setActionTextColor(getResources().getColor(R.color.colorWhite)).show();
     }
 
     public void onClickMoreForecast(View v) {
@@ -232,6 +232,10 @@ public class MainActivity extends AppCompatActivity implements OnPlaceChanged, V
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             startActivity(browserIntent);
         }
+    }
+
+    public void onClickLayoutHeader(View v){
+        goToPlaces();
     }
 
     //    @Override

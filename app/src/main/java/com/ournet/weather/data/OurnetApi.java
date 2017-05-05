@@ -24,12 +24,12 @@ public class OurnetApi {
         props.put("Content-Type", "application/json");
         props.put("Accept", "application/json");
 
-        return JsonClient.post("http://10.0.2.2:41522/graphql", props, json).getJSONObject("data");
+        return JsonClient.post("http://ournetapi.com/graphql", props, json).getJSONObject("data");
     }
 
     public static ForecastReport getForecast(ILocation location, ForecastDetails details) throws JSONException, IOException {
 
-        String json = "{\"query\": \"{weatherReport(latitude:@latitude,longitude:@longitude,days:@days)}\"}";
+        String json = "{\"query\": \"{report:weather_report(latitude:@latitude,longitude:@longitude,days:@days)}\"}";
         json = json.replace("@latitude", String.valueOf(location.getLatitude()));
         json = json.replace("@longitude", String.valueOf(location.getLongitude()));
         String days = "null";
@@ -39,16 +39,16 @@ public class OurnetApi {
 
         json = json.replace("@days", days);
 
-        JSONObject data = graphql(json).getJSONObject("weatherReport");
+        JSONObject data = graphql(json).getJSONObject("report");
 
         return ForecastReport.create(data);
     }
 
     public static Place findPlace(int id) throws JSONException, IOException {
-        String json = "{\"query\":\"{geoPlace(id:@id){id,name,alternatenames,timezone,country_code,longitude,latitude,region{id,name,alternatenames}}}\"}";
+        String json = "{\"query\":\"{place:places_place(id:@id){id,name,alternatenames,timezone,country_code,longitude,latitude,region{id,name,alternatenames}}}\"}";
         json = json.replace("@id", String.valueOf(id));
 
-        JSONObject data = graphql(json).getJSONObject("geoPlace");
+        JSONObject data = graphql(json).getJSONObject("place");
 
         return Place.create(data);
     }
@@ -66,7 +66,7 @@ public class OurnetApi {
     }
 
     public static ArrayList<Place> findPlaces(String query, String country) throws JSONException, IOException {
-        String json = "{\"query\":\"{geoPlaces(query:\\\"@query\\\",country:@country,limit:5){id,name,alternatenames,country_code,region{name,alternatenames}}}\"}";
+        String json = "{\"query\":\"{places:places_searchPlace(query:\\\"@query\\\",country:@country,limit:5){id,name,alternatenames,country_code,region{name,alternatenames}}}\"}";
         json = json.replace("@query", query.replaceAll("\"",""));
         if(country==null || country.length()!=2){
             json = json.replace("@country", "null");
@@ -74,7 +74,7 @@ public class OurnetApi {
             json = json.replace("@country", "\\\""+country+"\\\"");
         }
 
-        JSONArray data = graphql(json).getJSONArray("geoPlaces");
+        JSONArray data = graphql(json).getJSONArray("places");
 
         return Place.create(data);
     }

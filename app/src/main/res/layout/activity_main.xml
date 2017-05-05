@@ -49,21 +49,27 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
+                android:clickable="true"
+                android:onClick="onClickLayoutHeader"
                 android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/appbar_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/colorTextPrimary"
-                    android:textSize="@dimen/h1_size" />
+                    android:textColor="@color/colorAccent"
+                    android:textSize="@dimen/h1_size"
+                    android:text="Title"/>
 
                 <TextView
                     android:id="@+id/appbar_subtitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/colorTextSecondary" />
+                    android:textStyle="italic"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:textColor="@color/colorTextSecondary"
+                    android:text="subtitle"/>
             </LinearLayout>
 
             <Button
@@ -141,13 +147,13 @@
     </RelativeLayout>
 
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email"
-        android:visibility="gone"/>
+    <!--<android.support.design.widget.FloatingActionButton-->
+        <!--android:id="@+id/fab"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="end|bottom"-->
+        <!--android:layout_margin="@dimen/fab_margin"-->
+        <!--app:srcCompat="@android:drawable/ic_dialog_email"-->
+        <!--android:visibility="gone"/>-->
 
 </android.support.design.widget.CoordinatorLayout>

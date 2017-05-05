@@ -34,6 +34,8 @@ public class JsonClient {
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 
+            connection.setConnectTimeout(3000);
+            connection.setReadTimeout(5000);
 
             connection.setUseCaches(false);
             connection.setDoInput(true);
@@ -64,7 +66,7 @@ public class JsonClient {
             }
             rd.close();
             String jsonString = response.toString();
-            Log.i("data", "JSON: " + jsonString);
+//            Log.i("data", "JSON: " + jsonString);
             return new JSONObject(jsonString);
 
         } catch (ProtocolException e) {
@@ -125,7 +127,7 @@ public class JsonClient {
 
             jsonString = sb.toString();
 
-            Log.i("data", "JSON: " + jsonString);
+//            Log.i("data", "JSON: " + jsonString);
 
             return new JSONObject(jsonString);
         } finally {
